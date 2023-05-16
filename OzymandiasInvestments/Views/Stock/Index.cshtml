@@ -1,0 +1,11 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+<br>
+<div class="text-center">
+    <h1 class="display-4">Investment Tracker</h1>
+    <form class="d-flex" action="@Url.Action("StockSearch","Stock")">
+        <input class="form-control me-sm-2" type="search" name="ticker" placeholder="Ticker Lookup">
+        <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
+    </form>
+</div>
