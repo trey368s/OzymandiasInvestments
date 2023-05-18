@@ -31,6 +31,11 @@ namespace OzymandiasInvestments.Controllers
             return View();
         }
 
+        public IActionResult Startpage()
+        {
+            return Redirect("https://stegeman.dev");
+        }
+
         [Authorize]
         public IActionResult AddInvestmentPage()
         {
