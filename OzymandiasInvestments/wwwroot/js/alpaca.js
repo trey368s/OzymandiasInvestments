@@ -1,4 +1,5 @@
-﻿document.querySelector('form').addEventListener('submit', function (event) {
+﻿/*todo remove
+ * document.getElementById('searchButton').addEventListener('submit', function (event) {
     event.preventDefault();
 
     var searchInput = document.getElementById('searchInput');
@@ -38,3 +39,40 @@
         }
     }
 });
+*/
+urlSymbol = window.location.href;
+if (urlSymbol.includes("=")) {
+    tickerSymbol = urlSymbol.substring(urlSymbol.lastIndexOf("=") + 1);
+    document.getElementById("symbol").innerHTML = tickerSymbol;
+
+    const url = "wss://stream.data.alpaca.markets/v2/iex"
+    const auth = { "action": "auth", "key": "PK4PC5CXDNCF4UTBITT4", "secret": "4xIewFitft6JCzwtdH9hVSAJZI6cHNBiA78f9IRz" }
+    const subscribe = { "action": "subscribe", "trades": [tickerSymbol], "quotes": [tickerSymbol], "bars": [tickerSymbol] }
+
+    const socket = new WebSocket(url);
+    socket.onmessage = function (event) {
+        const data = JSON.parse(event.data)
+        const message = data[0]['msg']
+
+        if (message === 'connected') {
+            socket.send(JSON.stringify(auth))
+        }
+
+        if (message === 'authenticated') {
+            socket.send(JSON.stringify(subscribe))
+        }
+
+        for (const key in data) {
+            console.log(data[key])
+            if (data[key]["T"] === 't') {
+                console.log(data[key])
+            }
+            if (data[key]["T"] === 'q') {
+                console.log(data[key])
+            }
+            if (data[key]["T"] === 'b') {
+                console.log(data[key])
+            }
+        }
+    }
+}

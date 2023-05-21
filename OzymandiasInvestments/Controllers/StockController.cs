@@ -42,12 +42,6 @@ namespace OzymandiasInvestments.Controllers
             return View();
         }
 
-        [HttpGet]
-        public IActionResult StockSearch(string ticker)
-        {
-            return Redirect("https://finance.yahoo.com/quote/" + ticker);
-        }
-
         [Authorize]
         public IActionResult Portfolio()
         {
