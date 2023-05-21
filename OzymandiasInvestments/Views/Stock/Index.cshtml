@@ -4,8 +4,13 @@
 <br>
 <div class="text-center">
     <h1 class="display-4">Investment Tracker</h1>
-    <form class="d-flex" action="@Url.Action("StockSearch","Stock")">
-        <input class="form-control me-sm-2" type="search" name="ticker" placeholder="Ticker Lookup">
+    <form class="d-flex">
+        <input class="form-control me-sm-2" type="search" name="ticker" id = "searchInput" placeholder="Ticker Lookup">
         <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
     </form>
 </div>
+<br>
+<h3 id = "symbol"></h3>
+<div id="consoleOutput"></div>
+<script src="~/js/alpaca.js" asp-append-version="true"></script>
+<script src="~/js/console.js" asp-append-version="true"></script>
