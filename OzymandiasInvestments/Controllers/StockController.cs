@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.EntityFrameworkCore;
+using Alpaca.Markets;
+using OzymandiasInvestments.Classes;
+using OzymandiasInvestments.Models.SolutionModels;
 
 namespace OzymandiasInvestments.Controllers
 {
@@ -16,19 +19,43 @@ namespace OzymandiasInvestments.Controllers
         private readonly ILogger<StockController> _logger;
         private readonly InvestmentDbContext _dbContext;
         private readonly UserManager<OzymandiasInvestmentsUser> _userManager;
+        private readonly GetHistoricalData _historicalData;
+        private IEnumerable<IBar> _bars;
 
         public StockController(UserManager<OzymandiasInvestmentsUser> userManager,
             ILogger<StockController> logger,
-            InvestmentDbContext dbContext)
+            InvestmentDbContext dbContext, GetHistoricalData historicalData)
         {
             _userManager = userManager;
             _logger = logger;
             _dbContext = dbContext;
+            _historicalData = historicalData;
         }
 
+        [HttpGet]
         public IActionResult Index()
         {
-            return View();
+            var viewModel = new HistoricalDataModel
+            {
+                Bars = Enumerable.Empty<IBar>()
+            };
+            return View(viewModel);
+        }
+        [HttpPost]
+        public async Task<IActionResult> Index(string ticker)
+        {
+            string symbol = ticker ?? "AAPL";
+            DateTime start = DateTime.Today.AddDays(-1);
+            DateTime end = DateTime.Today;
+            var timeframe = BarTimeFrame.Minute; 
+
+            var bars = await _historicalData.GetHistoricalDataAsync(symbol, start, end, timeframe);
+            var viewModel = new HistoricalDataModel
+            {
+                Bars = bars
+            };
+            
+            return View("Index", viewModel);
         }
 
         public IActionResult Startpage()

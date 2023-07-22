@@ -1,16 +1,34 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
+@model OzymandiasInvestments.Models.SolutionModels.HistoricalDataModel
 <br>
 <div class="text-center">
     <h1 class="display-4">Investment Tracker</h1>
-    <form class="d-flex">
+    <form class="d-flex" method="post" asp-controller="Stock" asp-action="Index">
         <input class="form-control me-sm-2" type="search" name="ticker" id = "searchInput" placeholder="Ticker Lookup">
         <button class="btn btn-secondary my-2 my-sm-0" type="submit" id="searchButton">Search</button>
     </form>
 </div>
+<br/>
+<div>
+    @if (Model.Bars != null && Model.Bars.Any())
+    {
+        <h3>@Model.Bars.FirstOrDefault()?.Symbol</h3>
+        foreach (var bar in Model.Bars)
+        {
+            <p>@bar.TimeUtc:o - Open: @bar.Open, High: @bar.High, Low: @bar.Low, Close: @bar.Close, Volume: @bar.Volume</p>
+        }
+    }
+    else
+    {
+        <p class="text-center">No market data available, please enter a ticker.</p>
+    }
+</div>
 <br>
-<h3 id = "symbol"></h3>
-<div id="consoleOutput"></div>
-<script src="~/js/alpaca.js" asp-append-version="true"></script>
-<script src="~/js/console.js" asp-append-version="true"></script>
+<script>
+    if (!localStorage.getItem('alertShown')) {
+        alert('This application is for development puropses only. It does not provide personal investment advice and is not a qualified licensed financial advisor.');
+        localStorage.setItem('alertShown', 'true');
+    }
+</script>

@@ -3,68 +3,53 @@
     ViewData["Title"] = "Portfolio";
 }
 <br>
-<h4>Investments</h4>
-
-<table class="table table-hover">
-    <thead>
-    <tr>
-        <th>Id</th>
-        <th>Ticker</th>
-        <th>Shares</th>
-        <th>Open Price</th>
-        <th>Open Time</th>
-        <th>Close Price</th>
-        <th>Close Time</th>
-        <th>Profit</th>
-        <th></th>
-    </tr>
-    </thead>
-    <tbody>
-    @{
-        string[] classes = new string[] { "table-primary", "table-secondary", "table-success", "table-danger", "table-warning", "table-info", "table-light" };
-    }
-
-    @foreach (var investment in Model)
-    {
-        int cssClasses = (int)(investment.Id % classes.Length);
-        string rowClass = classes[cssClasses];
-
-        <tr class="@rowClass">
-            <td>@investment.Id</td>
-            <td>@investment.Symbol</td>
-            <td>@investment.Shares</td>
-            <td>$@investment.OpenPrice</td>
-            <td>@investment.OpenTime</td>
-            <td>
-                @if (investment.ClosePrice == null)
-                {
-                    <form method="get" action="@Url.Action("CloseInvestment", "Stock", investment.Id)">
-                        <input type="hidden" name="id" value="@investment.Id" />
-                        <button type="submit" class="btn btn-secondary">Close</button>
-                    </form>
-                }
-                else
-                {
-                    @(investment.ClosePrice != null ? "$" + investment.ClosePrice : investment.ClosePrice)
-                }
-            </td>
-            <td>
-                @if (investment.CloseTime == null)
-                {
-                    <form method="get" action="@Url.Action("UpdateInvestment", "Stock", investment.Id)">
-                        <input type="hidden" name="id" value="@investment.Id" />
-                        <button type="submit" class="btn btn-secondary">Edit/Delete</button>
-                    </form>
-                }
-                else
-                {
-                    @investment.CloseTime
-                }
-            </td>
-            <td>@(investment.Profit != null ? "$" + investment.Profit : investment.Profit)</td>
-
+<h3>Investment Portfolio</h3>
+<a href="/Stock/AddInvestmentPage">Add Investment</a>
+<div class="table-responsive mt-3">
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th></th>
+            <th>Ticker</th>
+            <th>Shares</th>
+            <th>Open Price</th>
+            <th>Open Time</th>
+            <th>Close Price</th>
+            <th>Close Time</th>
+            <th>Profit</th>
+            <th>Actions</th>
         </tr>
-    }
-    </tbody>
-</table>
-<br/>
+        </thead>
+        <tbody>
+            @{
+                string[] classes = new string[] { "table-primary", "table-success", "table-light", "table-danger", "table-warning", "table-info" };
+            }
+
+            @foreach (var investment in Model)
+            {
+                int cssClasses = (int)(investment.Id % classes.Length);
+                string rowClass = classes[cssClasses];
+
+                <tr class="@rowClass">
+                    <td></td>
+                    <td>@investment.Symbol</td>
+                    <td>@investment.Shares</td>
+                    <td>$@investment.OpenPrice</td>
+                    <td>@investment.OpenTime</td>
+                    <td>@(investment.ClosePrice != null ? "$" + investment.ClosePrice : investment.ClosePrice)</td>
+                    <td>@investment.CloseTime</td>
+                    <td>@(investment.Profit != null ? "$" + investment.Profit : investment.Profit)</td>
+                    <td>
+                        <di class="d-flex flex-row">
+                            <form method="get" action="@Url.Action("UpdateInvestment", "Stock", new { id = investment.Id })">
+                                <input type="hidden" name="id" value="@investment.Id"/>
+                                <button type="submit" class="btn btn-secondary">Edit</button>
+                            </form>
+                        </di>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<br />
