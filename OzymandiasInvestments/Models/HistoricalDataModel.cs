@@ -1,9 +1,10 @@
 ﻿using Alpaca.Markets;
 
-namespace OzymandiasInvestments.Models.SolutionModels
+namespace OzymandiasInvestments.Models
 {
     public class HistoricalDataModel
     {
         public IEnumerable<IBar>? Bars { get; set; }
+        public List<IBar> listBars { get; set; }
     }
 }

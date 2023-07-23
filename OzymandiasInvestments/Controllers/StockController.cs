@@ -10,7 +10,6 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Alpaca.Markets;
 using OzymandiasInvestments.Classes;
-using OzymandiasInvestments.Models.SolutionModels;
 
 namespace OzymandiasInvestments.Controllers
 {
@@ -19,12 +18,12 @@ namespace OzymandiasInvestments.Controllers
         private readonly ILogger<StockController> _logger;
         private readonly InvestmentDbContext _dbContext;
         private readonly UserManager<OzymandiasInvestmentsUser> _userManager;
-        private readonly GetHistoricalData _historicalData;
+        private readonly GetMarketData _historicalData;
         private IEnumerable<IBar> _bars;
 
         public StockController(UserManager<OzymandiasInvestmentsUser> userManager,
             ILogger<StockController> logger,
-            InvestmentDbContext dbContext, GetHistoricalData historicalData)
+            InvestmentDbContext dbContext, GetMarketData historicalData)
         {
             _userManager = userManager;
             _logger = logger;
@@ -41,20 +40,23 @@ namespace OzymandiasInvestments.Controllers
             };
             return View(viewModel);
         }
+
         [HttpPost]
         public async Task<IActionResult> Index(string ticker)
         {
             string symbol = ticker ?? "AAPL";
-            DateTime start = DateTime.Today.AddDays(-1);
+            DateTime start = DateTime.Now.AddMonths(-3);
             DateTime end = DateTime.Today;
-            var timeframe = BarTimeFrame.Minute; 
+            var timeframe = BarTimeFrame.Day;
 
             var bars = await _historicalData.GetHistoricalDataAsync(symbol, start, end, timeframe);
             var viewModel = new HistoricalDataModel
             {
                 Bars = bars
             };
-            
+
+            //await _historicalData.AddRealTimeBarDataAsync(viewModel, symbol);
+
             return View("Index", viewModel);
         }
 
@@ -64,7 +66,7 @@ namespace OzymandiasInvestments.Controllers
         }
 
         [Authorize]
-        public IActionResult AddInvestmentPage()
+        public IActionResult AddInvestment()
         {
             return View();
         }
@@ -171,6 +173,7 @@ namespace OzymandiasInvestments.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> UpdateInvestment(Investments model)
         {
             if (ModelState.IsValid)
