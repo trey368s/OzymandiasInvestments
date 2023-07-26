@@ -32,7 +32,10 @@
 
                 <tr class="@rowClass">
                     <td></td>
-                    <td>@investment.Symbol</td>
+                    <form id="postForm" method="post" action="@Url.Action("Index", "Stock")">
+                        <input type="hidden" name="ticker" value="@investment.Symbol" />
+                    </form>
+                    <td><a onclick="document.getElementById('postForm').submit()">@investment.Symbol</a></td>
                     <td>@investment.Shares</td>
                     <td>$@investment.OpenPrice</td>
                     <td>@investment.OpenTime</td>

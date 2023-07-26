@@ -3,29 +3,6 @@
 }
 @model HistoricalDataModel
 <br>
-<div class="text-center">
-    <h1 class="display-4">Investment Tracker</h1>
-    <form class="d-flex" method="post" asp-controller="Stock" asp-action="Index">
-        <input class="form-control me-sm-2" type="search" name="ticker" id = "searchInput" placeholder="Ticker Lookup">
-        <button class="btn btn-secondary my-2 my-sm-0" type="submit" id="searchButton">Search</button>
-    </form>
-</div>
-<br/>
-<h3 id="symbol"></h3>
-@*<div>
-    @if (Model.Bars != null && Model.Bars.Any())
-    {
-        <h3>@Model.Bars.FirstOrDefault()?.Symbol</h3>
-        foreach (var bar in Model.Bars)
-        {
-            <p>Time: @bar.TimeUtc,  Open: @bar.Open, High: @bar.High, Low: @bar.Low, Close: @bar.Close, Volume: @bar.Volume @bar.</p>
-        }
-    }
-    else
-    {
-        <p class="text-center">No market data available, please enter a ticker.</p>
-    }
-</div>*@
 <style>
     /* Add this style to make the chart-wrapper div cover the entire card */
     .chart-wrapper {
@@ -43,12 +20,23 @@
         height: 100%;
     }
 </style>
+<div class="text-center">
+    <h1 class="display-4">Investment Tracker</h1>
+    <form class="d-flex" method="post" asp-controller="Stock" asp-action="Index">
+        <input class="form-control me-sm-2" type="search" name="ticker" id = "searchInput" placeholder="Ticker Lookup">
+        <button class="btn btn-secondary my-2 my-sm-0" type="submit" id="searchButton">Search</button>
+    </form>
+</div>
+<br/>
 <div class="container">
     <div class="row">
         <div class="col-md-4">
             <div class="card">
+                <div class="card-title">
+                    <h3 id="symbol"></h3>
+                </div>
                 <div class="card-body">
-                    <div class ="card-wrapper" id="chart-card">
+                    <div class="card-wrapper" id="chart-card">
                         <div id="candlestick-chart"></div>
                     </div>
                 </div>
@@ -57,15 +45,27 @@
         </div>
         <div class="col-md-4">
             <div class="card">
+                <div class="card-title">
+                    <h3>News</h3>
+                </div>
                 <div class="card-body">
-                    <h5>Trades</h5>
+                    @if (Model.articles != null)
+                    {
+                        @foreach (var article in Model.articles)
+                        {
+                            <a href="@article.ArticleUrl"><p>@article.Headline</p></a>
+                        }
+                    }
                 </div>
             </div>
         </div>
         <div class="col-md-4">
             <div class="card">
+                <div class="card-title">
+                    <h3>Positions</h3>
+                </div>
                 <div class="card-body">
-                    <h5>Positions</h5>
+                    <h5>test</h5>
                 </div>
             </div>
         </div>

@@ -30,6 +30,10 @@ namespace OzymandiasInvestments.Controllers
             _dbContext = dbContext;
             _historicalData = historicalData;
         }
+        public IActionResult Startpage()
+        {
+            return Redirect("https://stegeman.dev");
+        }
 
         [HttpGet]
         public IActionResult Index()
@@ -44,33 +48,26 @@ namespace OzymandiasInvestments.Controllers
         [HttpPost]
         public async Task<IActionResult> Index(string ticker)
         {
-            string symbol = ticker ?? "AAPL";
-            DateTime start = DateTime.Now.AddMonths(-3);
-            DateTime end = DateTime.Today;
+            string symbol = ticker ?? "SPY";
+            DateTime start = DateTime.Now.AddMonths(-12);
+            DateTime end = DateTime.Today.AddMinutes(-15);
             var timeframe = BarTimeFrame.Day;
-
             var bars = await _historicalData.GetHistoricalDataAsync(symbol, start, end, timeframe);
+            var symbolsList = new List<string>();
+            symbolsList.Add(ticker);
+            var request = new NewsArticlesRequest(symbolsList);
+            var news = await _historicalData.GetNewsAsync(request);
             var viewModel = new HistoricalDataModel
             {
-                Bars = bars
+                Bars = bars,
+                articles = news
             };
 
             //await _historicalData.AddRealTimeBarDataAsync(viewModel, symbol);
-
             return View("Index", viewModel);
         }
 
-        public IActionResult Startpage()
-        {
-            return Redirect("https://stegeman.dev");
-        }
-
-        [Authorize]
-        public IActionResult AddInvestment()
-        {
-            return View();
-        }
-
+        [HttpGet]
         [Authorize]
         public IActionResult Portfolio()
         {
@@ -82,7 +79,14 @@ namespace OzymandiasInvestments.Controllers
             return View(investments);
         }
 
+        [Authorize]
+        public IActionResult AddInvestment()
+        {
+            return View();
+        }
+
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> AddInvestment(decimal openPrice, string symbol, decimal shares, DateTime dateTime)
         {
             var user = await _userManager.GetUserAsync(User);
@@ -102,10 +106,11 @@ namespace OzymandiasInvestments.Controllers
             _dbContext.Investment.Add(investment);
             _dbContext.SaveChanges();
 
-            return RedirectToAction("Index");
+            return RedirectToAction("Portfolio");
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> CloseInvestment(int id)
         {
             var investment = await _dbContext.Investment.FindAsync(id);
@@ -129,6 +134,7 @@ namespace OzymandiasInvestments.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> CloseInvestment(int id, decimal closePrice, DateTime closeTime)
         {
             var investment = await _dbContext.Investment.FindAsync(id);
@@ -148,6 +154,7 @@ namespace OzymandiasInvestments.Controllers
 
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> UpdateInvestment(int id)
         {
             var investment = await _dbContext.Investment.FindAsync(id);
@@ -204,6 +211,7 @@ namespace OzymandiasInvestments.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> DeleteInvestment(int id)
         {
             var investment = await _dbContext.Investment.FindAsync(id);

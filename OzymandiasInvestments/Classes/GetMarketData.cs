@@ -1,10 +1,14 @@
 ﻿using Alpaca.Markets;
+using OzymandiasInvestments.Migrations.InvestmentDb;
 using OzymandiasInvestments.Models;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net.Mime;
 using System.Threading.Tasks;
+using Alpaca.Markets.Extensions;
+using System.Linq;
 
 namespace OzymandiasInvestments.Classes
 {
@@ -24,11 +28,28 @@ namespace OzymandiasInvestments.Classes
         public async Task<IEnumerable<IBar>> GetHistoricalDataAsync(string symbol, DateTime start, DateTime end, BarTimeFrame timeframe)
         {
             var client = Alpaca.Markets.Environments.Paper.GetAlpacaDataClient(new SecretKey(_apiKey, _apiSecret));
-
             var request = new HistoricalBarsRequest(symbol, start, end, timeframe);
-
             var page = await client.ListHistoricalBarsAsync(request);
             return page.Items;
+        }
+
+        internal async Task<List<INewsArticle>> GetNewsAsync(NewsArticlesRequest newsRequest)
+        {
+            var client = Alpaca.Markets.Environments.Paper.GetAlpacaDataClient(new SecretKey(_apiKey, _apiSecret));
+            var newsArticlesAsyncEnumerable = client.GetNewsArticlesAsAsyncEnumerable(newsRequest);
+            var newsArticlesList = new List<INewsArticle>();
+            var counter = 0;
+
+            await foreach (var newsArticle in newsArticlesAsyncEnumerable)
+            {
+                newsArticlesList.Add(newsArticle);
+                counter++;
+                if (counter >= 5)
+                {
+                    break;
+                }
+            }
+            return newsArticlesList;
         }
 
         internal async Task AddRealTimeBarDataAsync(HistoricalDataModel viewModel, string symbol)
@@ -40,22 +61,16 @@ namespace OzymandiasInvestments.Classes
             {
                 lock (locker)
                 {
-                    // Check if minute bar data exists for the current symbol
                     if (!minuteBarsData.TryGetValue(symbol, out var minuteTrades))
                     {
                         minuteTrades = new List<ITrade>();
                         minuteBarsData[symbol] = minuteTrades;
                     }
-
-                    // Add the trade to the minute trades list
                     minuteTrades.Add(trade);
-
-                    // Check if we need to create or update a minute bar
                     var currentMinute = DateTime.UtcNow.Minute;
                     var barTime = trade.TimestampUtc;
                     if (minuteTrades.Count > 0 && barTime.Minute != currentMinute)
                     {
-                        // Create a new minute bar and add it to the view model
                         var newBar = new Bar
                         {
                             Time = new DateTime(barTime.Year, barTime.Month, barTime.Day, barTime.Hour, currentMinute, 0),
@@ -66,8 +81,6 @@ namespace OzymandiasInvestments.Classes
                             Volume = minuteTrades.Sum(t => t.Size)
                         };
                         viewModel.listBars.Add(newBar);
-
-                        // Clear the trades list for the next minute
                         minuteTrades.Clear();
                     }
                 }
