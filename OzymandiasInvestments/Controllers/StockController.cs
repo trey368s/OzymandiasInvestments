@@ -57,11 +57,18 @@ namespace OzymandiasInvestments.Controllers
             symbolsList.Add(ticker);
             var request = new NewsArticlesRequest(symbolsList);
             var news = await _historicalData.GetNewsAsync(request);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var investments = _dbContext.Investment
+                .Where(w => w.UserId == userId && w.Symbol == ticker)
+                .OrderByDescending(o => o.OpenTime)
+                .ToList();
             var viewModel = new HistoricalDataModel
             {
                 Bars = bars,
-                articles = news
+                articles = news,
+                Investments = investments 
             };
+            
 
             //await _historicalData.AddRealTimeBarDataAsync(viewModel, symbol);
             return View("Index", viewModel);

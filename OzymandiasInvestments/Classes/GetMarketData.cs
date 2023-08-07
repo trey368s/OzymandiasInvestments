@@ -44,7 +44,7 @@ namespace OzymandiasInvestments.Classes
             {
                 newsArticlesList.Add(newsArticle);
                 counter++;
-                if (counter >= 5)
+                if (counter >= 6)
                 {
                     break;
                 }

@@ -29,47 +29,109 @@
 </div>
 <br/>
 <div class="container">
-    <div class="row">
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-title">
-                    <h3 id="symbol"></h3>
+    @if (Model == null || Model.Bars.Count() == 0)
+    {
+        <h4 class="text-center">Enter a ticker symbol for detailed stock information.</h4>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-title">
+                        <h3 id="symbol"></h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-wrapper" id="chart-card">
+                            <div id="candlestick-chart"></div>
+                        </div>
+                    </div>
+                    <script src="~/js/alpaca.js"></script>
                 </div>
-                <div class="card-body">
-                    <div class="card-wrapper" id="chart-card">
-                        <div id="candlestick-chart"></div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-title">
+                        <h3>News</h3>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.articles != null)
+                        {
+                            @foreach (var article in Model.articles)
+                            {
+                                <a href="@article.ArticleUrl"><p>@article.Headline</p></a>
+                            }
+                        }
                     </div>
                 </div>
-                <script src="~/js/alpaca.js"></script>
             </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-title">
-                    <h3>News</h3>
-                </div>
-                <div class="card-body">
-                    @if (Model.articles != null)
+            <div class="col-md-4">
+                <div class="card">
+                    <h3>Positions</h3>
+                    @if (!User.Identity.IsAuthenticated)
                     {
-                        @foreach (var article in Model.articles)
+                        <div class="card-body">
+                            <p class=""><a id="login" asp-area="Identity" asp-page="/Account/Login">Login</a> to see open positions.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        @if (Model.Investments != null)
                         {
-                            <a href="@article.ArticleUrl"><p>@article.Headline</p></a>
+                            <div class="table-responsive mt-3">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>Ticker</th>
+                                            <th>Shares</th>
+                                            <th>Open Price</th>
+                                            <th>Open Time</th>
+                                            <th>Close Price</th>
+                                            <th>Close Time</th>
+                                            <th>Profit</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            string[] classes = new string[] { "table-primary", "table-success", "table-light", "table-danger", "table-warning", "table-info" };
+                                        }
+                                        @foreach (var investment in Model.Investments.Take(6))
+                                        {
+                                            int cssClasses = (int)(investment.Id % classes.Length);
+                                            string rowClass = classes[cssClasses];
+                                            <tr class="@rowClass">
+                                                <td></td>
+                                                <form id="postForm" method="post" action="@Url.Action("Index", "Stock")">
+                                                    <input type="hidden" name="ticker" value="@investment.Symbol" />
+                                                </form>
+                                                <td><a onclick="document.getElementById('postForm').submit()">@investment.Symbol</a></td>
+                                                <td>@investment.Shares</td>
+                                                <td>$@investment.OpenPrice</td>
+                                                <td>@investment.OpenTime</td>
+                                                <td>@(investment.ClosePrice != null ? "$" + investment.ClosePrice : investment.ClosePrice)</td>
+                                                <td>@investment.CloseTime</td>
+                                                <td>@(investment.Profit != null ? "$" + investment.Profit : investment.Profit)</td>
+                                                <td>
+                                                    <di class="d-flex flex-row">
+                                                        <form method="get" action="@Url.Action("UpdateInvestment", "Stock", new { id = investment.Id })">
+                                                            <input type="hidden" name="id" value="@investment.Id" />
+                                                            <button type="submit" class="btn btn-secondary">Edit</button>
+                                                        </form>
+                                                    </di>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
                         }
                     }
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-title">
-                    <h3>Positions</h3>
-                </div>
-                <div class="card-body">
-                    <h5>test</h5>
-                </div>
-            </div>
-        </div>
-    </div>
+    }
 </div>
 <br>
 <br/>
