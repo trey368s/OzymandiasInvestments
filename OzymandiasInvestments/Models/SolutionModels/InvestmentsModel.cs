@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace OzymandiasInvestments.Models
+namespace OzymandiasInvestments.Models.SolutionModels
 {
-    public class Investments
+    public class InvestmentsModel
     {
         public int Id { get; set; }
         public string Symbol { get; set; }

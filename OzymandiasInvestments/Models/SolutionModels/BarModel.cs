@@ -1,9 +1,9 @@
 ﻿using System;
 using Alpaca.Markets;
 
-namespace OzymandiasInvestments.Models
+namespace OzymandiasInvestments.Models.SolutionModels
 {
-    public class Bar : IBar
+    public class BarModel : IBar
     {
         public DateTime Time { get; set; }
         public decimal Open { get; set; }
