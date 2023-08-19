@@ -10,6 +10,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Alpaca.Markets;
 using OzymandiasInvestments.Classes;
+using OzymandiasInvestments.Models.SolutionModels;
 
 namespace OzymandiasInvestments.Controllers
 {
@@ -54,7 +55,7 @@ namespace OzymandiasInvestments.Controllers
             var timeframe = BarTimeFrame.Day;
             var bars = await _historicalData.GetHistoricalDataAsync(symbol, start, end, timeframe);
             var symbolsList = new List<string>();
-            symbolsList.Add(ticker);
+            symbolsList.Add(ticker.ToUpper());
             var request = new NewsArticlesRequest(symbolsList);
             var news = await _historicalData.GetNewsAsync(request);
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -98,7 +99,7 @@ namespace OzymandiasInvestments.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
             var userId = user.Id;
-            var investment = new Investments()
+            var investment = new InvestmentsModel()
             {
                 UserId = userId,
                 Symbol = symbol,
@@ -124,7 +125,7 @@ namespace OzymandiasInvestments.Controllers
 
             if (investment != null)
             {
-                Investments model = new Investments
+                InvestmentsModel model = new InvestmentsModel
                 {
                     Id = investment.Id,
                     Symbol = investment.Symbol,
@@ -168,7 +169,7 @@ namespace OzymandiasInvestments.Controllers
 
             if (investment != null)
             {
-                Investments model = new Investments
+                InvestmentsModel model = new InvestmentsModel
                 {
                     Id = investment.Id,
                     Symbol = investment.Symbol,
@@ -188,7 +189,7 @@ namespace OzymandiasInvestments.Controllers
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> UpdateInvestment(Investments model)
+        public async Task<IActionResult> UpdateInvestment(InvestmentsModel model)
         {
             if (ModelState.IsValid)
             {

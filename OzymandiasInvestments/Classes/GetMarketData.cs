@@ -1,6 +1,5 @@
 ﻿using Alpaca.Markets;
 using OzymandiasInvestments.Migrations.InvestmentDb;
-using OzymandiasInvestments.Models;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,6 +8,7 @@ using System.Net.Mime;
 using System.Threading.Tasks;
 using Alpaca.Markets.Extensions;
 using System.Linq;
+using OzymandiasInvestments.Models.SolutionModels;
 
 namespace OzymandiasInvestments.Classes
 {
@@ -71,7 +71,7 @@ namespace OzymandiasInvestments.Classes
                     var barTime = trade.TimestampUtc;
                     if (minuteTrades.Count > 0 && barTime.Minute != currentMinute)
                     {
-                        var newBar = new Bar
+                        var newBar = new BarModel
                         {
                             Time = new DateTime(barTime.Year, barTime.Month, barTime.Day, barTime.Hour, currentMinute, 0),
                             Open = minuteTrades.First().Price,

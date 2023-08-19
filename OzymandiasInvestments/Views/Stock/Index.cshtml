@@ -1,7 +1,8 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
-@model HistoricalDataModel
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model OzymandiasInvestments.Models.SolutionModels.HistoricalDataModel
 <br>
 <style>
     /* Add this style to make the chart-wrapper div cover the entire card */
@@ -137,9 +138,12 @@
 <br/>
 <script src="~/js/chart.js" asp-append-version="true"></script>
 <script>
-    if (!localStorage.getItem('alertShown')) {
-        alert('This application is for development puropses only. It does not provide personal investment advice and is not a qualified licensed financial advisor.');
-        localStorage.setItem('alertShown', 'true');
+    var currentTime = new Date().getTime();
+    var lastAlertTime = localStorage.getItem('lastAlertTime');
+    
+    if (!lastAlertTime || (currentTime - lastAlertTime > 86400000)) {
+        alert('This application is for development purposes only. It does not provide personal investment advice and is not a qualified licensed financial adviser.');
+        localStorage.setItem('lastAlertTime', currentTime);
     }
 </script>
 <script>

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using OzymandiasInvestments.Areas.Identity.Data;
-using OzymandiasInvestments.Models;
+using OzymandiasInvestments.Models.SolutionModels;
 
 namespace OzymandiasInvestments.Areas.Identity.Data;
 
@@ -39,5 +39,5 @@ public class InvestmentDbContext : DbContext
     public InvestmentDbContext(DbContextOptions<InvestmentDbContext> options) : base(options)
     {
     }
-    public DbSet<Investments> Investment { get; set; }
+    public DbSet<InvestmentsModel> Investment { get; set; }
 }
