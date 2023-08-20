@@ -1,8 +1,6 @@
 ﻿@{
     ViewData["Title"] = "Add Investment";
 }
-<br>
-<h1>@ViewData["Title"]</h1>
 <form asp-controller="Stock" asp-action="AddInvestment" method="post">
     <div class="form-group">
         <label class="form-label mt-4">Price</label>
@@ -33,8 +31,7 @@
             </div>
         </div>
         <br>
-        <button class="btn btn-primary" type="submit" id="button-addon2">Create</button>
+        <button class="btn btn-secondary" type="submit" id="button-addon2">Create</button>
     </div>
 </form>
-<br>
 <br>

@@ -4,8 +4,25 @@
     ViewData["Title"] = "Portfolio";
 }
 <br>
+<script src="~/lib/jquery/dist/jquery.js"></script>
 <h3>Investment Portfolio</h3>
-<a href="/Stock/AddInvestment">Add Investment</a>
+<a style="text-decoration: underline;" data-toggle="modal" data-target="#addInvestmentModal">Add Investment</a>
+<div class="modal fade" id="addInvestmentModal" tabindex="-1" role="dialog" aria-labelledby="addInvestmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="addInvestmentModalLabel">Add Investment</h3>
+                <button type="button" class="close" onclick="$('#addInvestmentModal').modal('hide');" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                @await Html.PartialAsync("AddInvestment")
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="table-responsive mt-3">
     <table class="table table-hover">
         <thead>
@@ -36,7 +53,7 @@
                     <form id="postForm" method="post" action="@Url.Action("Index", "Stock")">
                         <input type="hidden" name="ticker" value="@investment.Symbol" />
                     </form>
-                    <td><a onclick="document.getElementById('postForm').submit()">@investment.Symbol</a></td>
+                        <td><a style="text-decoration: underline;" onclick="document.getElementById('postForm').submit()">@investment.Symbol</a></td>
                     <td>@investment.Shares</td>
                     <td>$@investment.OpenPrice</td>
                     <td>@investment.OpenTime</td>
@@ -45,11 +62,23 @@
                     <td>@(investment.Profit != null ? "$" + investment.Profit : investment.Profit)</td>
                     <td>
                         <di class="d-flex flex-row">
-                            <form method="get" action="@Url.Action("UpdateInvestment", "Stock", new { id = investment.Id })">
-                                <input type="hidden" name="id" value="@investment.Id"/>
-                                <button type="submit" class="btn btn-secondary">Edit</button>
-                            </form>
+                                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#updateModal-@investment.Id">Edit</button>
                         </di>
+                        <div class="modal fade" id="updateModal-@investment.Id" tabindex="-1" role="dialog" aria-labelledby="updateModalLabel-@investment.Id" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                            <h3 class="modal-title" id="updateModalLabel-@investment.Id">Update Investment</h3>
+                                            <button type="button" class="close" onclick="$('#updateModal-@investment.Id').modal('hide');" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        @await Html.PartialAsync("UpdateInvestment", investment)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </td>
                 </tr>
             }
@@ -57,3 +86,10 @@
     </table>
 </div>
 <br />
+<script>
+    $(document).on('click', '[data-toggle="modal"]', function() {
+        var targetModal = $(this).data('target');
+        $(targetModal).modal('show');
+    });
+</script>
+

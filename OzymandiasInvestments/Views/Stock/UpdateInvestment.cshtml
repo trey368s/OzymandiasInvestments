@@ -4,12 +4,9 @@
 @{
     ViewData["Title"] = "Update Investment";
 }
-<br>
-<h1>Update Investment</h1>
 @{
     var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 }
-
 <form asp-action="UpdateInvestment" method="post" class="d-inline">
     <div class="form-group">
         <label class="form-label mt-3">Symbol</label>
@@ -45,7 +42,7 @@
     <input type="hidden" name="UserId" value="@userId" />
     <br>
     <div>
-        <button class="btn btn-primary" type="submit" id="button-addon2">Update</button>
+        <button class="btn btn-light" type="submit" id="button-addon2">Update</button>
     </div>
     <br>
 </form>
@@ -53,7 +50,6 @@
     <input type="hidden" name="id" value="@Model.Id" />
     <button type="submit" class="btn btn-danger float-right">Delete</button>
 </form>
-<br>
 <br>
 <br>
 @if (!ViewData.ModelState.IsValid)
