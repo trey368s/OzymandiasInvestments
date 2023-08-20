@@ -16,9 +16,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body">
-                @await Html.PartialAsync("AddInvestment")
-            </div>
+            @await Html.PartialAsync("AddInvestment")
         </div>
     </div>
 </div>
@@ -73,9 +71,7 @@
                                             <span aria-hidden="true">&times;</span>
                                         </button>
                                     </div>
-                                    <div class="modal-body">
-                                        @await Html.PartialAsync("UpdateInvestment", investment)
-                                    </div>
+                                    @await Html.PartialAsync("UpdateInvestment", investment)
                                 </div>
                             </div>
                         </div>
