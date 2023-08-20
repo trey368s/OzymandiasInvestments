@@ -7,7 +7,6 @@
 @{
     var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 }
-<div class="modal-body" style="max-height: 50vh; overflow-y: auto;">
 <form asp-action="UpdateInvestment" method="post" class="d-inline">
     <div class="form-group">
         <label class="form-label mt-3">Symbol</label>
@@ -53,7 +52,6 @@
 </form>
 <br>
 <br>
-</div>
 @if (!ViewData.ModelState.IsValid)
 {
     <div class="alert alert-danger">

@@ -66,12 +66,14 @@
                             <div class="modal-dialog" role="document">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                            <h3 class="modal-title" id="updateModalLabel-@investment.Id">Update Investment</h3>
-                                            <button type="button" class="close" onclick="$('#updateModal-@investment.Id').modal('hide');" aria-label="Close">
+                                        <h3 class="modal-title" id="updateModalLabel-@investment.Id">Update Investment</h3>
+                                        <button type="button" class="close" onclick="$('#updateModal-@investment.Id').modal('hide');" aria-label="Close">
                                             <span aria-hidden="true">&times;</span>
                                         </button>
                                     </div>
-                                    @await Html.PartialAsync("UpdateInvestment", investment)
+                                    <div class="modal-body" style="max-height: 66vh; overflow-y: auto;">
+                                        @await Html.PartialAsync("UpdateInvestment", investment)
+                                    </div>
                                 </div>
                             </div>
                         </div>

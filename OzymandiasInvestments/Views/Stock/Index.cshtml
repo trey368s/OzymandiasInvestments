@@ -126,7 +126,9 @@
                                                                             <span aria-hidden="true">&times;</span>
                                                                         </button>
                                                                     </div>
-                                                                    @await Html.PartialAsync("UpdateInvestment", investment)
+                                                                    <div class="modal-body" style="max-height: 66vh; overflow-y: auto;">
+                                                                        @await Html.PartialAsync("UpdateInvestment", investment)
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
