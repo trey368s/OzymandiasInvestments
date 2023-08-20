@@ -6,21 +6,9 @@
 <br>
 <script src="~/lib/jquery/dist/jquery.js"></script>
 <h3>Investment Portfolio</h3>
+<div id="modalContainerAdd"></div>
+@await Html.PartialAsync("AddInvestmentModal")
 <a style="text-decoration: underline;" data-toggle="modal" data-target="#addInvestmentModal">Add Investment</a>
-<div class="modal fade" id="addInvestmentModal" tabindex="-1" role="dialog" aria-labelledby="addInvestmentModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title" id="addInvestmentModalLabel">Add Investment</h3>
-                <button type="button" class="close" onclick="$('#addInvestmentModal').modal('hide');" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            @await Html.PartialAsync("AddInvestment")
-        </div>
-    </div>
-</div>
-
 <div class="table-responsive mt-3">
     <table class="table table-hover">
         <thead>
@@ -40,8 +28,7 @@
             @{
                 string[] classes = new string[] { "table-primary", "table-success", "table-light", "table-danger", "table-warning", "table-info" };
             }
-
-            @foreach (var investment in Model)
+        @foreach (var investment in Model)
             {
                 int cssClasses = (int)(investment.Id % classes.Length);
                 string rowClass = classes[cssClasses];
@@ -60,23 +47,10 @@
                     <td>@(investment.Profit != null ? "$" + investment.Profit : investment.Profit)</td>
                     <td>
                         <di class="d-flex flex-row">
-                                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#updateModal-@investment.Id">Edit</button>
+                            <div id="modalContainerUpdate" data-investment-id="@investment.Id"></div>
+                            @await Html.PartialAsync("UpdateInvestmentModal", investment)
+                            <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#updateModal-@investment.Id">Edit</button>
                         </di>
-                        <div class="modal fade" id="updateModal-@investment.Id" tabindex="-1" role="dialog" aria-labelledby="updateModalLabel-@investment.Id" aria-hidden="true">
-                            <div class="modal-dialog" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h3 class="modal-title" id="updateModalLabel-@investment.Id">Update Investment</h3>
-                                        <button type="button" class="close" onclick="$('#updateModal-@investment.Id').modal('hide');" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <div class="modal-body" style="max-height: 66vh; overflow-y: auto;">
-                                        @await Html.PartialAsync("UpdateInvestment", investment)
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </td>
                 </tr>
             }
@@ -90,4 +64,28 @@
         $(targetModal).modal('show');
     });
 </script>
+<script>
+    function appendModalToContainer(modalHtml) {
+        $('#modalContainer').html(modalHtml);
+    }
 
+    $(document).ready(function() {
+        var addInvestmentHtml = $('#addInvestmentModal').html();
+
+        $('#addInvestmentModal').on('hidden.bs.modal', function () {
+            // Reset the "Add Investment" modal content when the modal is hidden
+            $('#modalContainerAdd').html('');
+        });
+
+        $(document).on('click', '[data-toggle="modal"]', function() {
+            var targetModal = $(this).data('target');
+            if (targetModal === '#addInvestmentModal') {
+                appendModalToContainer(addInvestmentHtml);
+            } else {
+                var investmentId = $(this).data('investment-id');
+                var updateModalHtml = $('#updateModal-' + investmentId).html();
+                appendModalToContainer(updateModalHtml);
+            }
+        });
+    });
+</script>
