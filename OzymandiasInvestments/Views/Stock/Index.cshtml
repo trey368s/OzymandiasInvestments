@@ -116,6 +116,8 @@
                                                 <td>@(investment.Profit != null ? "$" + investment.Profit : investment.Profit)</td>
                                                 <td>
                                                     <di class="d-flex flex-row">
+                                                        <div id="modalContainer" data-investment-id="@investment.Id"></div>
+                                                        @await Html.PartialAsync("UpdateInvestmentModal", investment)
                                                         <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#updateModal-@investment.Id">Edit</button>
                                                         <div class="modal fade" id="updateModal-@investment.Id" tabindex="-1" role="dialog" aria-labelledby="updateModalLabel-@investment.Id" aria-hidden="true">
                                                             <div class="modal-dialog" role="document">
@@ -166,5 +168,12 @@
     $(document).on('click', '[data-toggle="modal"]', function() {
         var targetModal = $(this).data('target');
         $(targetModal).modal('show');
+    });
+</script>
+<script>
+    $(document).ready(function() {
+        var investmentId = $('#modalContainer').data('investment-id');
+        var modalHtml = $('#updateModal-' + investmentId).detach();
+        $('#modalContainer').append(modalHtml);
     });
 </script>
