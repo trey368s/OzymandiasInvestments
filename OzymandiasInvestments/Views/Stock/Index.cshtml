@@ -165,9 +165,15 @@
     var modelData = @Html.Raw(Json.Serialize(Model));
 </script>
 <script>
-    $(document).on('click', '[data-toggle="modal"]', function() {
-        var targetModal = $(this).data('target');
-        $(targetModal).modal('show');
+    $(document).ready(function () {
+        $('#myModal').on('shown.bs.modal', function () {
+            $('#myInput').trigger('focus');
+        });
+
+        $(document).on('click', '[data-toggle="modal"]', function () {
+            var targetModal = $(this).data('target');
+            $(targetModal).modal('show');
+        });
     });
 </script>
 <script>
