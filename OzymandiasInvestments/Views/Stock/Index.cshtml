@@ -119,6 +119,21 @@
                                                         <div id="modalContainer" data-investment-id="@investment.Id"></div>
                                                         @await Html.PartialAsync("UpdateInvestmentModal", investment)
                                                         <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#updateModal-@investment.Id">Edit</button>
+                                                        <div class="modal fade" id="updateModal-@investment.Id" tabindex="-1" role="dialog" aria-labelledby="updateModalLabel-@investment.Id" aria-hidden="true">
+                                                            <div class="modal-dialog" role="document">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <h3 class="modal-title" id="updateModalLabel-@investment.Id">Update Investment</h3>
+                                                                            <button type="button" class="close" onclick="$('#updateModal-@investment.Id').modal('hide');" aria-label="Close">
+                                                                            <span aria-hidden="true">&times;</span>
+                                                                        </button>
+                                                                    </div>
+                                                                    <div class="modal-body" style="max-height: 40vh; overflow-y: auto;">
+                                                                        @await Html.PartialAsync("UpdateInvestment", investment)
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     </di>
                                                 </td>
                                             </tr>
