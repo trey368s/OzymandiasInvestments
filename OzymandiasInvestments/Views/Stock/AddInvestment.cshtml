@@ -1,7 +1,6 @@
 ﻿@{
     ViewData["Title"] = "Add Investment";
 }
-<div class="modal-body" style="max-height: 66vh; overflow-y: auto;">
 <form asp-controller="Stock" asp-action="AddInvestment" method="post">
     <div class="form-group">
         <label class="form-label mt-4">Price</label>
@@ -22,7 +21,7 @@
         <div class="form-group">
             <div class="input-group mb-3">
                 <span class="input-group-text">Quantity</span>
-                <input type="number" step='0.01' class="form-control" name="shares" placeholder="3.75">
+                <input type="number" step='0.01' class="form-control" name="shares" placeholder="0.00">
             </div>
         </div>
         <label class="form-label mt-4">Date Time</label>
@@ -36,4 +35,3 @@
     </div>
 </form>
 <br>
-</div>
