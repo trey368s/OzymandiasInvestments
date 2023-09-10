@@ -150,20 +150,13 @@
 </script>
 <script>
     $(document).ready(function () {
-        $('#myModal').on('shown.bs.modal', function () {
-            $('#myInput').trigger('focus');
+        $('[id^=updateModal-]').on('shown.bs.modal', function () {
+            $('#symbol').trigger('focus');
         });
 
         $(document).on('click', '[data-toggle="modal"]', function () {
             var targetModal = $(this).data('target');
             $(targetModal).modal('show');
         });
-    });
-</script>
-<script>
-    $(document).ready(function() {
-        var investmentId = $('#modalContainer').data('investment-id');
-        var modalHtml = $('#updateModal-' + investmentId).detach();
-        $('#modalContainer').append(modalHtml);
     });
 </script>

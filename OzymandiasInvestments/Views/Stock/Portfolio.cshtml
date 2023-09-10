@@ -59,8 +59,12 @@
 <br />
 <script>
     $(document).ready(function() {
-        $('#myModal').on('shown.bs.modal', function() {
-            $('#myInput').trigger('focus');
+        $('[id^=updateModal-]').on('shown.bs.modal', function() {
+            $('#symbol').trigger('focus');
+        });
+
+        $('#addInvestmentModal').on('shown.bs.modal', function() {
+            $(this).find('#OpenPrice').trigger('focus');
         });
 
         $(document).on('click', '[data-toggle="modal"]', function() {
