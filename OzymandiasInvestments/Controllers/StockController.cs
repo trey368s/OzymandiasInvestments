@@ -55,12 +55,12 @@ namespace OzymandiasInvestments.Controllers
             var timeframe = BarTimeFrame.Day;
             var bars = await _historicalData.GetHistoricalDataAsync(symbol, start, end, timeframe);
             var symbolsList = new List<string>();
-            symbolsList.Add(ticker.ToUpper());
+            symbolsList.Add(ticker.ToUpper().Trim());
             var request = new NewsArticlesRequest(symbolsList);
             var news = await _historicalData.GetNewsAsync(request);
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var investments = _dbContext.Investment
-                .Where(w => w.UserId == userId && w.Symbol == ticker)
+                .Where(w => w.UserId == userId && w.Symbol == ticker.ToUpper().Trim())
                 .OrderByDescending(o => o.OpenTime)
                 .ToList();
             var viewModel = new HistoricalDataModel
