@@ -49,7 +49,7 @@ namespace OzymandiasInvestments.Controllers
         [HttpPost]
         public async Task<IActionResult> Index(string ticker)
         {
-            string symbol = ticker ?? "SPY";
+            string symbol = ticker.ToUpper().Trim() ?? "SPY";
             DateTime start = DateTime.Now.AddMonths(-12);
             DateTime end = DateTime.Today.AddMinutes(-15);
             var timeframe = BarTimeFrame.Day;
