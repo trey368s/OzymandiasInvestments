@@ -1,11 +1,11 @@
 ﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
 @model List<OzymandiasInvestments.Models.SolutionModels.InvestmentsModel>
 @{
-    ViewData["Title"] = "Portfolio";
+    ViewData["Title"] = "Investments";
 }
 <br>
 <script src="~/lib/jquery/dist/jquery.js"></script>
-<h3>Investment Portfolio</h3>
+<h3>Investments</h3>
 @await Html.PartialAsync("AddInvestmentModal")
 <a style="text-decoration: underline;" data-toggle="modal" data-target="#addInvestmentModal">Add Investment</a>
 

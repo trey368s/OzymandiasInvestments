@@ -28,6 +28,8 @@ var ApiKey = configSettings.AlpacaApiSettings.ApiKey;
 var ApiSecret = configSettings.AlpacaApiSettings.ApiSecret;
 
 builder.Services.AddScoped<GetMarketData>(provider => new GetMarketData(ApiKey, ApiSecret));
+builder.Services.AddScoped<GetOrderData>(provider => new GetOrderData(ApiKey, ApiSecret));
+builder.Services.AddScoped<GetPositionData>(provider => new GetPositionData(ApiKey, ApiSecret));
 
 builder.Services.AddControllersWithViews().AddRazorPagesOptions(options =>
 {

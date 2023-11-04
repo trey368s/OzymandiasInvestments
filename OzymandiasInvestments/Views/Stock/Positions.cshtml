@@ -1,0 +1,65 @@
+﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using System.Data;
+@model System.Data.DataTable
+@{
+    ViewData["Title"] = "Open Positions";
+    var rowIndex =  0;
+}
+<br>
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<h3>@ViewData["Title"]</h3>
+
+<div class="table-responsive mt-3" >
+    <table class="table table-hover">
+        <tr>
+            <th></th>
+            @foreach (DataColumn column in Model.Columns)
+            {
+                <th><b>@column.ColumnName</b></th>
+            }
+        </tr>
+        @foreach (DataRow row in Model.Rows)
+        {
+            var color = "lawngreen"; 
+
+            if (row["Total P/L ($)"].ToString().Contains("-"))
+            {
+                color = "red";
+            }
+
+            <tr style="border: 1px solid cyan;">
+                <td></td>
+                @foreach (DataColumn column in Model.Columns)
+                {
+                    if (column.ColumnName == "Symbol")
+                    {
+                        <td>
+                            <form id="postForm_@rowIndex" method="post" action="@Url.Action("Index", "Stock")">
+                                <input type="hidden" name="ticker" value="@row["Symbol"]" />
+                            </form>
+                            <a style="text-decoration: underline; cursor: pointer; color: cyan;" onclick="submitForm('postForm_@rowIndex')">@row["Symbol"]</a>
+                        </td>
+                    }
+                    else if (column.ColumnName == "Total P/L ($)" || column.ColumnName == "Total P/L (%)")
+                    {
+                        <td style="color: @color;">
+                            @row[column.ColumnName]
+                        </td>
+                    }
+                    else
+                    {
+                        <td>@row[column]</td>
+                    }
+                }
+            </tr>
+            rowIndex++;
+        }
+    </table>
+</div>
+<br>
+<script>
+    function submitForm(formId) {
+        var form = document.getElementById(formId);
+        form.submit();
+    }
+</script>

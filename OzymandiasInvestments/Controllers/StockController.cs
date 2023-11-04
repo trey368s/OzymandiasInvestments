@@ -20,16 +20,20 @@ namespace OzymandiasInvestments.Controllers
         private readonly InvestmentDbContext _dbContext;
         private readonly UserManager<OzymandiasInvestmentsUser> _userManager;
         private readonly GetMarketData _historicalData;
+        private readonly GetOrderData _orderData;
+        private readonly GetPositionData _positionData;
         private IEnumerable<IBar> _bars;
 
         public StockController(UserManager<OzymandiasInvestmentsUser> userManager,
             ILogger<StockController> logger,
-            InvestmentDbContext dbContext, GetMarketData historicalData)
+            InvestmentDbContext dbContext, GetMarketData historicalData, GetPositionData positionData, GetOrderData orderData)
         {
             _userManager = userManager;
             _logger = logger;
             _dbContext = dbContext;
             _historicalData = historicalData;
+            _positionData = positionData;
+            _orderData = orderData;
         }
         public IActionResult Startpage()
         {
@@ -77,7 +81,7 @@ namespace OzymandiasInvestments.Controllers
 
         [HttpGet]
         [Authorize]
-        public IActionResult Portfolio()
+        public IActionResult Investments()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var investments = _dbContext.Investment
@@ -230,6 +234,22 @@ namespace OzymandiasInvestments.Controllers
                 return RedirectToAction("Portfolio");
             }
             return NotFound();
+        }
+
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> Positions()
+        {
+            var request = await _positionData.GetPositions();
+            return View(request);
+        }
+
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> Orders()
+        {
+            var request = await _orderData.GetOrders();      
+            return View(request);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
