@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Home";
 }
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @model OzymandiasInvestments.Models.SolutionModels.HistoricalDataModel
@@ -36,6 +36,17 @@
         <center>
             <img src="~/lib/Logo.png">
         </center>
+        <div class="toast show ms-auto" role="alert" aria-live="assertive" aria-atomic="true" style="position: fixed; bottom: 20px; right: 20px;">
+            <div class="toast-header">
+                <strong class="me-auto">Disclaimer</strong>
+                <button type="button" class="btn-close ms-2 mb-1" data-bs-dismiss="toast" aria-label="Close">
+                    <span aria-hidden="true"></span>
+                </button>
+            </div>
+            <div class="toast-body">
+                This application is for development purposes only. It does not provide personal investment advice and is not a qualified licensed financial advisor.
+            </div>
+        </div>
     }
     else
     {
@@ -140,15 +151,6 @@
 <script src="~/js/chart.js" asp-append-version="true"></script>
 <script src="~/lib/jquery/dist/jquery.js"></script>
 <script>
-    var currentTime = new Date().getTime();
-    var lastAlertTime = localStorage.getItem('lastAlertTime');
-    
-    if (!lastAlertTime || (currentTime - lastAlertTime > 86400000)) {
-        alert('This application is for development purposes only. It does not provide personal investment advice and is not a qualified licensed financial advisor.');
-        localStorage.setItem('lastAlertTime', currentTime);
-    }
-</script>
-<script>
     var modelData = @Html.Raw(Json.Serialize(Model));
 </script>
 <script>
@@ -163,3 +165,17 @@
         });
     });
 </script>
+<script>
+    function showBottomRightToast() {
+        $('.toast').toast('show');
+
+        setTimeout(function () {
+            $('.toast').toast('hide');
+        }, 10000); 
+    }
+
+    $(document).ready(function () {
+        showBottomRightToast();
+    });
+</script>
+

@@ -37,12 +37,12 @@ namespace OzymandiasInvestments.Classes
             {
                 DataRow row = dataTable.NewRow();
                 row["Symbol"] = position.Symbol;
-                row["Current Price"] = "$" + Math.Round((decimal)position.AssetLastPrice,2);
+                row["Current Price"] = "$" + Math.Round((decimal)position.AssetLastPrice,2).ToString("0.00");
                 row["Quantity"] = position.Quantity;
-                row["Market Value"] = "$" + Math.Round((decimal)position.MarketValue,2);
-                row["Cost Basis"] = "$" + Math.Round(position.CostBasis,2);
-                row["Total P/L ($)"] = "$" + Math.Round((decimal)position.UnrealizedProfitLoss, 2);
-                row["Total P/L (%)"] = Math.Round((decimal)position.UnrealizedProfitLossPercent, 2) + "%";
+                row["Market Value"] = "$" + Math.Round((decimal)position.MarketValue,2).ToString("0.00");
+                row["Cost Basis"] = "$" + Math.Round(position.CostBasis,2).ToString("0.00");
+                row["Total P/L (%)"] = Math.Round((decimal)position.UnrealizedProfitLossPercent, 2).ToString("0.00") + "%";
+                row["Total P/L ($)"] = "$" + Math.Round((decimal)position.UnrealizedProfitLoss, 2).ToString("0.00");
                 dataTable.Rows.Add(row);
             }
             return dataTable;

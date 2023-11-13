@@ -39,8 +39,8 @@ namespace OzymandiasInvestments.Classes
             dataTable.Columns.Add("Filled Price", typeof(string));
             dataTable.Columns.Add("Limit Price", typeof(string));
             dataTable.Columns.Add("Stop Price", typeof(string));
-            dataTable.Columns.Add("Submitted At", typeof(DateTime));
-            dataTable.Columns.Add("Filled At", typeof(DateTime));
+            dataTable.Columns.Add("Submitted At UTC", typeof(DateTime));
+            dataTable.Columns.Add("Filled At UTC", typeof(DateTime));
 
             foreach (var order in orders)
             {
@@ -51,11 +51,11 @@ namespace OzymandiasInvestments.Classes
                 row["Status"] = order.OrderStatus;
                 row["Quantity"] = order.Quantity;
                 row["Filled Quantity"] = order.FilledQuantity;
-                row["Filled Price"] = order.AverageFillPrice.HasValue ? "$" + Math.Round((decimal)order.AverageFillPrice,2) : DBNull.Value;
-                row["Limit Price"] = order.LimitPrice.HasValue ? "$" + Math.Round((decimal)order.LimitPrice,2) : DBNull.Value;
-                row["Stop Price"] = order.StopPrice.HasValue ? "$" + Math.Round((decimal)order.StopPrice,2) : DBNull.Value;
-                row["Submitted At"] = order.SubmittedAtUtc.HasValue ? (object)order.SubmittedAtUtc : DBNull.Value;
-                row["Filled At"] = order.FilledAtUtc.HasValue ? (object)order.FilledAtUtc : DBNull.Value;
+                row["Filled Price"] = order.AverageFillPrice.HasValue ? "$" + Math.Round((decimal)order.AverageFillPrice,2).ToString("0.00") : DBNull.Value;
+                row["Limit Price"] = order.LimitPrice.HasValue ? "$" + Math.Round((decimal)order.LimitPrice,2).ToString("0.00") : DBNull.Value;
+                row["Stop Price"] = order.StopPrice.HasValue ? "$" + Math.Round((decimal)order.StopPrice,2).ToString("0.00") : DBNull.Value;
+                row["Submitted At UTC"] = order.SubmittedAtUtc.HasValue ? (object)order.SubmittedAtUtc : DBNull.Value;
+                row["Filled At UTC"] = order.FilledAtUtc.HasValue ? (object)order.FilledAtUtc : DBNull.Value;
                 dataTable.Rows.Add(row);
             }
             return dataTable;
