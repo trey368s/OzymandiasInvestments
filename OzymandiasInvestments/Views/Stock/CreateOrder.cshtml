@@ -1,0 +1,191 @@
+﻿<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+    <div class="offcanvas-header">
+        <h3 id="offcanvasRightLabel">Place Order</h3>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <form method="post" action="@Url.Action("CreateOrder", "Stock")" id="orderForm">
+        <div class="offcanvas-body">
+            <div class="btn-group d-flex justify-content-center align-items-center" role="group" aria-label="Basic radio toggle button group">
+                <input type="radio" class="btn-check" name="side" value ="@Alpaca.Markets.OrderSide.Buy" id="btnradio1" autocomplete="off" checked>
+                <label class="btn btn-outline-secondary" for="btnradio1">BUY</label>
+                <input type="radio" class="btn-check" name="side" value="@Alpaca.Markets.OrderSide.Sell" id="btnradio2" autocomplete="off">
+                <label class="btn btn-outline-secondary" for="btnradio2">SELL</label>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <h5 class="form-label mt-4">Symbol</h5>
+                    <div class="form-group">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Ticker</span>
+                            <input type="text" class="form-control" id= "symbol" name="symbol">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <h5 class="form-label mt-4">Order Type</h5>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend w-100">
+                            <div class="dropdown">
+                                <select class="form-select" id="ordertype" name="orderType">
+                                    <option value="" selected disabled></option>
+                                    <option value="@Alpaca.Markets.OrderType.Market">Market</option>
+                                    <option value="@Alpaca.Markets.OrderType.Limit">Limit</option>
+                                    <option value="@Alpaca.Markets.OrderType.Stop">Stop</option>
+                                    <option value="@Alpaca.Markets.OrderType.StopLimit">Stop Limit</option>
+                                    <option value="@Alpaca.Markets.OrderType.TrailingStop">Trailing Stop</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="orderInput">
+            
+            </div>
+            <div class="row">
+                <h5 class="form-label mt-4">Time In Force</h5>
+                <div class="col-6">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <div class="dropdown">
+                                <select class="form-select" id="timeInForce" name="timeInForce">
+                                    <option value="" selected disabled></option>
+                                    <option value="@Alpaca.Markets.TimeInForce.Day" >Day</option>
+                                    <option value="@Alpaca.Markets.TimeInForce.Gtc">Good 'Til Canceled</option>
+                                    <option value="@Alpaca.Markets.TimeInForce.Fok">Fill or Kill</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <button class="btn btn-secondary w-100">Submit Order</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var typeDropdown = document.getElementById('ordertype');
+        var orderInputContainer = document.getElementById('orderInput');
+
+        typeDropdown.addEventListener('change', function () {
+            var selectedType = typeDropdown.value;
+
+            // Check if the selected type is 'Market'
+            if (selectedType == 'Market') {
+                // Display the quantity dropdown
+                orderInputContainer.innerHTML = `
+                    <h5 class="form-label mt-4">Quantity</h5>
+                    <div class="input-group mb-3" >
+                        <div class="input-group-prepend">
+                            <div class="dropdown">
+                                <select class="form-select" name="quantityType" id="quanitityType">
+                                    <option value="Shares" selected>Shares</option>
+                                    <option value="Dollars">Dollars</option>
+                                </select>
+                            </div>
+                        </div>
+                        <input type="number" step="0.01" class="form-control" name="quantity" id="quantity" aria-label="Text input with dropdown button">
+                    </div>
+                `;
+            } else if(selectedType == 'Limit'){
+                orderInputContainer.innerHTML = `
+                    <div class="row">
+                        <div class="col-6">
+                            <h5 class="form-label mt-4">Quantity</h5>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Shares</span>
+                                <input type="number" step="0.01" class="form-control" name="quantity" id="quanitity" aria-label="Text input for quantity">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <h5 class="form-label mt-4">Limit Price</h5>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">$</span>
+                                <input type="number" step="0.01" class="form-control" name ="limitPrice" id="limitPriceInput" aria-label="Text input for quantity">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (selectedType == 'Stop'){
+                orderInputContainer.innerHTML = `
+                    <div class="row">
+                        <div class="col-6">
+                            <h5 class="form-label mt-4">Quantity</h5>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Shares</span>
+                                <input type="number" step="0.01" class="form-control" name="quantity" id="quanitity" aria-label="Text input for quantity">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <h5 class="form-label mt-4">Stop Price</h5>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">$</span>
+                                <input type="number" step="0.01" class="form-control" name="stopPrice" id="stopPriceInput" aria-label="Text input for quantity">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if(selectedType == 'StopLimit') {
+                // If not 'Market' is selected, hide the quantity dropdown
+                orderInputContainer.innerHTML = `
+                    <div class="row">
+                        <div class="col-6">
+                            <h5 class="form-label mt-4">Limit Price</h5>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">$</span>
+                                <input type="number" step="0.01" class="form-control" name="limitPrice" id="limitPriceInput" aria-label="Text input for quantity">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <h5 class="form-label mt-4">Stop Price</h5>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">$</span>
+                                <input type="number" step="0.01" class="form-control" name="stopPrice" id="stopPriceInput" aria-label="Text input for quantity">
+                            </div>
+                        </div>
+                    </div>
+                    <h5 class="form-label mt-4">Quantity</h5>
+                    <div class="input-group mb-3" >
+                        <span class="input-group-text">Shares</span>
+                        <input type="number" step="0.01" class="form-control" name="quantity" id="quanitity" aria-label="Text input for quantity">
+                    </div>
+                `;
+            } else if(selectedType == 'TrailingStop'){
+                // If not 'Market' is selected, hide the quantity dropdown
+                orderInputContainer.innerHTML = `
+                    <h5 class="form-label mt-4">Trail Type</h5>
+                    <div class="input-group mb-3" >
+                        <div class="input-group-prepend">
+                            <div class="dropdown">
+                                <select class="form-select" name="trailType" id="trailType">
+                                    <option value="" selected>Dollars $</option>
+                                    <option value="Market">Percent %</option>
+                                </select>
+                            </div>
+                        </div>
+                        <input type="number" step="0.01" class="form-control" name="trailOffset" id="trailQuantity" aria-label="Text input with dropdown button">
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <h5 class="form-label mt-4">Stop Price</h5>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">$</span>
+                                <input type="number" step="0.01" class="form-control" name="stopPrice" id="stopPriceInput" aria-label="Text input for quantity">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <h5 class="form-label mt-4">Quantity</h5>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Shares</span>
+                                <input type="number" step="0.01" class="form-control" name="quantity" id="quantity" aria-label="Text input for quantity">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+    });
+</script>

@@ -3,11 +3,15 @@
 @model System.Data.DataTable
 @{
     ViewData["Title"] = "Order History";
-     int rowIndex = 0;
+    int rowIndex = 0;
 }
 <br>
 <script src="~/lib/jquery/dist/jquery.js"></script>
-<h3>@ViewData["Title"]</h3>
+<h3 class="d-flex justify-content-between align-items-center">
+    @ViewData["Title"]
+    <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">Create an order</button>
+    @await Html.PartialAsync("CreateOrder")
+</h3>
 
 <div class="table-responsive mt-3">
     <table class="table table-hover">
@@ -49,4 +53,11 @@
         var form = document.getElementById(formId);
         form.submit();
     }
+
+    $(document).ready(function () {
+        $(document).on('click', '[data-toggle="modal"]', function () {
+            var targetModal = $(this).data('target');
+            $(targetModal).modal('show');
+        });
+    });
 </script>

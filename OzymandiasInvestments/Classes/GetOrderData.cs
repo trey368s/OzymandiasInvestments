@@ -26,6 +26,43 @@ namespace OzymandiasInvestments.Classes
             return ConvertToDataTable(orders);
         }
 
+        public async Task<IOrder> CreateOrderAsync(string symbol, OrderQuantity quantity, OrderSide side, OrderType orderType, decimal? limitPrice, decimal? stopPrice, TrailOffset trailOffset, TimeInForce timeInForce)
+        {
+            var client = Alpaca.Markets.Environments.Paper.GetAlpacaTradingClient(new SecretKey(_apiKey, _apiSecret));
+
+            IOrder order = null;
+            switch (orderType)
+            {
+                case OrderType.Market:
+                    order = await client.PostOrderAsync(new NewOrderRequest(symbol, quantity, side, orderType, timeInForce));
+                    break;
+                case OrderType.Limit:
+                    order = await client.PostOrderAsync(new NewOrderRequest(symbol, quantity, side, orderType, timeInForce) { LimitPrice = limitPrice });
+                    break;
+                case OrderType.Stop:
+                    order = await client.PostOrderAsync(new NewOrderRequest(symbol, quantity, side, orderType, timeInForce) { StopPrice = stopPrice });
+                    break;
+                case OrderType.StopLimit:
+                    order = await client.PostOrderAsync(new NewOrderRequest(symbol, quantity, side, orderType, timeInForce) { StopPrice = stopPrice, LimitPrice = limitPrice });
+                    break;
+                case OrderType.TrailingStop:
+                    if (side == OrderSide.Buy)
+                    {
+                        order = await client.PostOrderAsync(TrailingStopOrder.Buy(symbol, quantity, trailOffset));
+                    }
+                    if (side == OrderSide.Sell)
+                    {
+                        order = await client.PostOrderAsync(TrailingStopOrder.Sell(symbol, quantity, trailOffset));
+                    }
+                    break;
+                default:
+                    {
+                        throw new ArgumentException("Invalid order type. Supported types: 'market', 'limit', 'stop', 'stop_limit', 'trailing_stop'");
+                    }
+            }
+            return order;
+        }
+
         public DataTable ConvertToDataTable(IEnumerable<IOrder> orders)
         {
             DataTable dataTable = new DataTable();
@@ -75,6 +112,17 @@ namespace OzymandiasInvestments.Classes
                 output += c;
             }
             return output;
+        }
+
+        public TEnum ParseEnum<TEnum>(string value)
+        where TEnum : struct, Enum
+        {
+            if (Enum.TryParse<TEnum>(value, true, out var result))
+            {
+                return result;
+            }
+
+            throw new ArgumentException($"Unsupported enum value: {value}");
         }
     }
 }

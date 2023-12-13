@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Alpaca.Markets;
 using OzymandiasInvestments.Classes;
 using OzymandiasInvestments.Models.SolutionModels;
+using OzymandiasInvestments.Migrations.InvestmentDb;
 
 namespace OzymandiasInvestments.Controllers
 {
@@ -250,6 +251,24 @@ namespace OzymandiasInvestments.Controllers
         {
             var request = await _orderData.GetOrders();      
             return View(request);
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> CreateOrder(string symbol, decimal quantity, OrderSide side, OrderType orderType, decimal? limitPrice, decimal? stopPrice, decimal trailOffset, TimeInForce timeInForce, string quantityType, string trailType)
+        {
+            OrderQuantity qty = OrderQuantity.Fractional(quantity);
+            if (quantityType == "Dollars")
+            {
+                qty = OrderQuantity.Notional(quantity);
+            }
+            TrailOffset offset = TrailOffset.InDollars(trailOffset);
+            if(trailType == "Percent %")
+            {
+                offset = TrailOffset.InPercent(trailOffset);
+            }
+            var request = await _orderData.CreateOrderAsync(symbol, qty, side, orderType, limitPrice, stopPrice, offset, timeInForce);
+            return RedirectToAction("Orders");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
