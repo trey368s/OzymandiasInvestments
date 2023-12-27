@@ -59,6 +59,9 @@ namespace OzymandiasInvestments.Controllers
             DateTime end = DateTime.Today.AddMinutes(-15);
             var timeframe = BarTimeFrame.Day;
             var bars = await _historicalData.GetHistoricalDataAsync(symbol, start, end, timeframe);
+            var recentBars = bars.OrderByDescending(b => b.TimeUtc).Take(10);
+            var volume = recentBars.Any() ? recentBars.Average(b => b.Volume) : 0;
+            var averageVolume = _historicalData.ShortenNumber(volume.ToString());
             var symbolsList = new List<string>();
             symbolsList.Add(ticker.ToUpper().Trim());
             var request = new NewsArticlesRequest(symbolsList);
@@ -68,15 +71,15 @@ namespace OzymandiasInvestments.Controllers
                 .Where(w => w.UserId == userId && w.Symbol == ticker.ToUpper().Trim())
                 .OrderByDescending(o => o.OpenTime)
                 .ToList();
+            var info = await _historicalData.GetDetailedCompanyInfo(symbol);
             var viewModel = new HistoricalDataModel
             {
                 Bars = bars,
                 articles = news,
-                Investments = investments 
+                Investments = investments,
+                detailedInfo = info,
+                averageVolume = averageVolume
             };
-            
-
-            //await _historicalData.AddRealTimeBarDataAsync(viewModel, symbol);
             return View("Index", viewModel);
         }
 
@@ -92,6 +95,7 @@ namespace OzymandiasInvestments.Controllers
             return View(investments);
         }
 
+        [HttpGet]
         [Authorize]
         public IActionResult AddInvestment()
         {
@@ -209,7 +213,7 @@ namespace OzymandiasInvestments.Controllers
                     existingInvestment.ClosePrice = model.ClosePrice;
                     existingInvestment.CloseTime = model.CloseTime;
                     existingInvestment.UserId = model.UserId;
-                    existingInvestment.Profit = (existingInvestment.ClosePrice * existingInvestment.Shares)-(existingInvestment.OpenPrice * existingInvestment.Shares);
+                    existingInvestment.Profit = (existingInvestment.ClosePrice * existingInvestment.Shares) - (existingInvestment.OpenPrice * existingInvestment.Shares);
 
                     _dbContext.Update(existingInvestment);
                     await _dbContext.SaveChangesAsync();
@@ -249,7 +253,15 @@ namespace OzymandiasInvestments.Controllers
         [Authorize]
         public async Task<IActionResult> Orders()
         {
-            var request = await _orderData.GetOrders();      
+            var request = await _orderData.GetOrders();
+            return View(request);
+        }
+
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> Activities()
+        {
+            var request = await _orderData.GetOrders();
             return View(request);
         }
 

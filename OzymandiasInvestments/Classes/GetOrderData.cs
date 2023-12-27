@@ -113,16 +113,5 @@ namespace OzymandiasInvestments.Classes
             }
             return output;
         }
-
-        public TEnum ParseEnum<TEnum>(string value)
-        where TEnum : struct, Enum
-        {
-            if (Enum.TryParse<TEnum>(value, true, out var result))
-            {
-                return result;
-            }
-
-            throw new ArgumentException($"Unsupported enum value: {value}");
-        }
     }
 }

@@ -52,40 +52,73 @@ namespace OzymandiasInvestments.Classes
             return newsArticlesList;
         }
 
-        internal async Task AddRealTimeBarDataAsync(HistoricalDataModel viewModel, string symbol)
+        internal async Task<DetailedInfoModel> GetDetailedCompanyInfo(string ticker)
         {
-            using var client = Alpaca.Markets.Environments.Live.GetAlpacaDataStreamingClient(new SecretKey(_apiKey, _apiSecret));
-            await client.ConnectAndAuthenticateAsync();
-            var tradeSubscription = client.GetTradeSubscription("AAPL");
-            tradeSubscription.Received += (trade) =>
+            string alphaVantageApiKey = "A5XRTJKVX2CIZFL1";
+            string symbol = ticker.ToUpper();
+            string endpoint = $"https://www.alphavantage.co/query";
+            string function = "OVERVIEW";
+
+            string queryString = $"?function={function}&symbol={symbol}&apikey={alphaVantageApiKey}";
+            using (HttpClient client = new HttpClient())
             {
-                lock (locker)
+                HttpResponseMessage response = await client.GetAsync(endpoint + queryString);
+                if (response.IsSuccessStatusCode)
                 {
-                    if (!minuteBarsData.TryGetValue(symbol, out var minuteTrades))
+                    string responseData = await response.Content.ReadAsStringAsync();
+                    dynamic companyData = Newtonsoft.Json.JsonConvert.DeserializeObject(responseData);
+                    string companyName = companyData.Name ?? "N/A";
+                    string marketCap = companyData.MarketCapitalization ?? "N/A";
+                    string description = companyData.Description ?? "N/A";
+                    string sector = companyData.Sector ?? "N/A";
+                    string industry = companyData.Industry ?? "N/A";
+                    string trailingPE = companyData.TrailingPE ?? "N/A";
+                    string eps = companyData.EPS ?? "N/A";
+                    string targetPrice = Math.Round((decimal)companyData.AnalystTargetPrice, 2).ToString("0.00") ?? "N/A";
+                    string yearHigh = Math.Round((decimal)companyData["52WeekHigh"], 2).ToString("0.00") ?? "N/A";
+                    string yearLow = Math.Round((decimal)companyData["52WeekLow"], 2).ToString("0.00") ?? "N/A";
+                    string movingAverage = Math.Round((decimal)companyData["50DayMovingAverage"], 2).ToString("0.00") ?? "N/A";
+                    DetailedInfoModel info = new DetailedInfoModel
                     {
-                        minuteTrades = new List<ITrade>();
-                        minuteBarsData[symbol] = minuteTrades;
-                    }
-                    minuteTrades.Add(trade);
-                    var currentMinute = DateTime.UtcNow.Minute;
-                    var barTime = trade.TimestampUtc;
-                    if (minuteTrades.Count > 0 && barTime.Minute != currentMinute)
-                    {
-                        var newBar = new BarModel
-                        {
-                            Time = new DateTime(barTime.Year, barTime.Month, barTime.Day, barTime.Hour, currentMinute, 0),
-                            Open = minuteTrades.First().Price,
-                            High = minuteTrades.Max(t => t.Price),
-                            Low = minuteTrades.Min(t => t.Price),
-                            Close = minuteTrades.Last().Price,
-                            Volume = minuteTrades.Sum(t => t.Size)
-                        };
-                        viewModel.listBars.Add(newBar);
-                        minuteTrades.Clear();
-                    }
+                        marketCap = ShortenNumber(marketCap),
+                        companyName = companyName,
+                        description = description,
+                        sector = sector,
+                        industry = industry,
+                        yearHigh = yearHigh,
+                        yearLow = yearLow,
+                        targetPrice = targetPrice,
+                        movingAverage = movingAverage,
+                        eps = eps,
+                        trailingPE = trailingPE
+                    };
+                    return info;
                 }
-            };
-            await client.SubscribeAsync(tradeSubscription);
+                else
+                {
+                    return new DetailedInfoModel { };
+                    //todo
+                }
+            }
+        }
+
+        internal string ShortenNumber(string input)
+        {
+            if (double.TryParse(input, out double number))
+            {
+                if (number >= 1_000_000_000_000)
+                    return $"{Math.Round(number / 1_000_000_000_000, 2)} T";
+                if (number >= 1_000_000_000)
+                    return $"{Math.Round(number / 1_000_000_000, 2)} B";
+                if (number >= 1_000_000)
+                    return $"{Math.Round(number / 1_000_000, 2)} M";
+                if (number >= 1_000)
+                    return $"{Math.Round(number / 1_000, 2)} K";
+
+                return Math.Round(number, 2).ToString();
+            }
+
+            return "Invalid input";
         }
     }
 }

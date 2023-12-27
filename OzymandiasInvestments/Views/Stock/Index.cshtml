@@ -54,7 +54,15 @@
             <div class="col-md-4">
                 <div class="card">
                     <div class="card-title">
-                        <h3 id="symbol"></h3>
+                        @if(Model.detailedInfo.companyName == "N/A")
+                        {
+                            <h3 id="symbol"></h3>
+                        }
+                        else
+                        {
+                            <h3 id="symbol" class="d-none"></h3>
+                            <h3>@Model.detailedInfo.companyName</h3>
+                        }
                     </div>
                     <div class="card-body">
                         <div class="card-wrapper" id="chart-card">
@@ -82,67 +90,50 @@
             </div>
             <div class="col-md-4">
                 <div class="card">
-                    <h3>Positions</h3>
-                    @if (!User.Identity.IsAuthenticated)
-                    {
-                        <div class="card-body">
-                            <p class=""><a id="login" asp-area="Identity" asp-page="/Account/Login">Login</a> to see open positions.</p>
-                        </div>
-                    }
-                    else
-                    {
-                        @if (Model.Investments != null)
-                        {
-                            <div class="table-responsive mt-3">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th></th>
-                                            <th>Ticker</th>
-                                            <th>Shares</th>
-                                            <th>Open Price</th>
-                                            <th>Open Time</th>
-                                            <th>Close Price</th>
-                                            <th>Close Time</th>
-                                            <th>Profit</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @{
-                                            string[] classes = new string[] { "table-primary", "table-success", "table-light", "table-danger", "table-warning", "table-info" };
-                                        }
-                                        @foreach (var investment in Model.Investments.Take(6))
-                                        {
-                                            int cssClasses = (int)(investment.Id % classes.Length);
-                                            string rowClass = classes[cssClasses];
-                                            <tr class="@rowClass">
-                                                <td></td>
-                                                <form id="postForm" method="post" action="@Url.Action("Index", "Stock")">
-                                                    <input type="hidden" name="ticker" value="@investment.Symbol" />
-                                                </form>
-                                                <td><a onclick="document.getElementById('postForm').submit()">@investment.Symbol</a></td>
-                                                <td>@investment.Shares</td>
-                                                <td>$@investment.OpenPrice</td>
-                                                <td>@investment.OpenTime</td>
-                                                <td>@(investment.ClosePrice != null ? "$" + investment.ClosePrice : investment.ClosePrice)</td>
-                                                <td>@investment.CloseTime</td>
-                                                <td>@(investment.Profit != null ? "$" + investment.Profit : investment.Profit)</td>
-                                                <td>
-                                                    <di class="d-flex flex-row">
-                                                        @await Html.PartialAsync("UpdateInvestmentModal", investment)
-                                                        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#updateModal-@investment.Id">Edit</button>
-                                                    </di>
-                                                </td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
+                    <h3>Detailed Info</h3>
+                    <div class="card-body">
+                        <p>Sector: @Model.detailedInfo.sector</p>
+                        <p>Industry: @Model.detailedInfo.industry</p>
+                        <div class="row">
+                            <div class="col-6">
+                                <span>Market Cap: @Model.detailedInfo.marketCap</span>
                             </div>
-                        }
-                    }
+                            <div class="col-6">
+                                <span>10D A. Volume: @Model.averageVolume</span>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-6">
+                                <span>50D MA: $@Model.detailedInfo.movingAverage</span>
+                            </div>
+                            <div class="col-6">
+                                <span>Target Price: $@Model.detailedInfo.targetPrice</span>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-6">
+                                <span>Year Low: $@Model.detailedInfo.yearLow</span>
+                            </div>
+                            <div class="col-6">
+                                <span>Year High: $@Model.detailedInfo.yearHigh</span>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-6">
+                                <span>PE: @Model.detailedInfo.trailingPE</span>
+                            </div>
+                            <div class="col-6">
+                                <span>EPS: @Model.detailedInfo.eps</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
+            <h3>Description</h3>
+            <p>@Model.detailedInfo.description</p>
         </div>
     }
 </div>
@@ -152,18 +143,6 @@
 <script src="~/lib/jquery/dist/jquery.js"></script>
 <script>
     var modelData = @Html.Raw(Json.Serialize(Model));
-</script>
-<script>
-    $(document).ready(function () {
-        $('[id^=updateModal-]').on('shown.bs.modal', function () {
-            $('#symbol').trigger('focus');
-        });
-
-        $(document).on('click', '[data-toggle="modal"]', function () {
-            var targetModal = $(this).data('target');
-            $(targetModal).modal('show');
-        });
-    });
 </script>
 <script>
     function showBottomRightToast() {
@@ -178,4 +157,3 @@
         showBottomRightToast();
     });
 </script>
-
