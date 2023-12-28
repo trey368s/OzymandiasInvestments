@@ -1,24 +1,27 @@
 ﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
 @using System.Data;
-@model System.Data.DataTable
+@model OzymandiasInvestments.Models.SolutionModels.PositionModel
 @{
     ViewData["Title"] = "Open Positions";
     var rowIndex =  0;
 }
 <br>
+<script>
+    var modelData = @Html.Raw(Json.Serialize(Model.equityModelList));
+</script>
 <script src="~/lib/jquery/dist/jquery.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <h3>@ViewData["Title"]</h3>
-
 <div class="table-responsive mt-3" >
     <table class="table table-hover">
         <tr>
             <th></th>
-            @foreach (DataColumn column in Model.Columns)
+            @foreach (DataColumn column in Model.positions.Columns)
             {
                 <th><b>@column.ColumnName</b></th>
             }
         </tr>
-        @foreach (DataRow row in Model.Rows)
+        @foreach (DataRow row in Model.positions.Rows)
         {
             var color = "lawngreen"; 
 
@@ -29,7 +32,7 @@
 
             <tr style="border: 1px solid cyan;">
                 <td></td>
-                @foreach (DataColumn column in Model.Columns)
+                @foreach (DataColumn column in Model.positions.Columns)
                 {
                     if (column.ColumnName == "Symbol")
                     {
@@ -56,6 +59,60 @@
         }
     </table>
 </div>
+<br>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="row" id="chart">
+                <span>Daily Change: @{
+                        decimal todayEquity = decimal.Parse(Model.info.accountValue);
+                        decimal yesterdayEquity = decimal.Parse(Model.info.yesterdayAccountValue);
+                        var dayChange = todayEquity - yesterdayEquity;
+                    }
+                    @if(dayChange >= 0)
+                    {
+                        <span style="color: lawngreen">$@Math.Round(dayChange, 2) 🤑</span>
+                    }
+                    else
+                    {
+                        <span style="color: red">$@Math.Round(dayChange, 2) 😓</span>
+                    }
+                </span>
+                <script src="~/js/alpaca.js"></script>
+                <div>
+                    <div id="areaChartContainer"></div>
+                </div>
+                <script src="~/js/equity.js"></script>
+            </div>
+        </div>
+        <div class="col-md-6" style="text-align: center;">
+            <div class="row" style="width:75%; margin: 0 auto;">
+                <div style="display: flex; align-items: center; justify-content: center;">
+                    <p>Account Value: $@Model.info.accountValue</p>
+                </div>
+                <div style ="display: flex; align-items: center; justify-content: center;">
+                    <canvas id="doughnutChart"></canvas>
+                </div>
+                <script>
+                    var doughnutData = {
+                        labels: ["Cash", "Long", "Short"],
+                        datasets: [{
+                            data: [@Model.info.cash, @Model.info.longValue, @Model.info.shortValue],
+                            backgroundColor: ["#280542", "#4CBB17", "#8B0000"]
+                        }]
+                    };
+
+                    var doughnutChart = new Chart(document.getElementById('doughnutChart'), {
+                        type: 'doughnut',
+                        data: doughnutData
+                    });
+                </script>
+            </div>
+        </div>
+    </div>
+</div>
+<br>
+<br>
 <br>
 <script>
     function submitForm(formId) {

@@ -1,0 +1,34 @@
+﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using System.Data;
+@model System.Data.DataTable
+@{
+    ViewData["Title"] = "Account Activities";
+    int rowIndex = 0;
+}
+<br>
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<h3>@ViewData["Title"]</h3>
+
+<div class="table-responsive mt-3">
+    <table class="table table-hover">
+        <tr>
+            <th></th>
+            @foreach (DataColumn column in Model.Columns)
+            {
+                <th><b>@column.ColumnName</b></th>
+            }
+        </tr>
+        @foreach (DataRow row in Model.Rows)
+        {
+            <tr style="border: 1px solid cyan;">
+                <td></td>
+                @foreach (DataColumn column in Model.Columns)
+                {
+                    <td>@row[column]</td>
+                }
+            </tr>
+            rowIndex++;
+        }
+    </table>
+</div>
+<br>

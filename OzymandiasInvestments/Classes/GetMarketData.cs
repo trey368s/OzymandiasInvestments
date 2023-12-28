@@ -16,13 +16,15 @@ namespace OzymandiasInvestments.Classes
     {
         private readonly string _apiKey;
         private readonly string _apiSecret;
+        private readonly string _alphaVantageKey;
         private readonly object locker = new object();
         private readonly Dictionary<string, List<ITrade>> minuteBarsData = new Dictionary<string, List<ITrade>>();
 
-        public GetMarketData(string apiKey, string apiSecret)
+        public GetMarketData(string apiKey, string apiSecret, string alphaVantageKey)
         {
             _apiKey = apiKey;
             _apiSecret = apiSecret;
+            _alphaVantageKey = alphaVantageKey;
         }
 
         public async Task<IEnumerable<IBar>> GetHistoricalDataAsync(string symbol, DateTime start, DateTime end, BarTimeFrame timeframe)
@@ -31,6 +33,18 @@ namespace OzymandiasInvestments.Classes
             var request = new HistoricalBarsRequest(symbol, start, end, timeframe);
             var page = await client.ListHistoricalBarsAsync(request);
             return page.Items;
+        }
+
+        public async Task<IEnumerable<IBar>> GetSmaDataAsync(string symbol, DateTime start, DateTime end, BarTimeFrame timeframe)
+        {
+            var client = Alpaca.Markets.Environments.Paper.GetAlpacaDataClient(new SecretKey(_apiKey, _apiSecret));
+            var request = new HistoricalBarsRequest(symbol, start, end, timeframe);
+            var bars = new List<IBar>();
+            await foreach (var bar in client.GetSimpleMovingAverageAsync<HistoricalBarsRequest>(request, 50))
+            {
+                bars.Add(bar);
+            }
+            return bars;
         }
 
         internal async Task<List<INewsArticle>> GetNewsAsync(NewsArticlesRequest newsRequest)
@@ -54,7 +68,7 @@ namespace OzymandiasInvestments.Classes
 
         internal async Task<DetailedInfoModel> GetDetailedCompanyInfo(string ticker)
         {
-            string alphaVantageApiKey = "A5XRTJKVX2CIZFL1";
+            string alphaVantageApiKey = _alphaVantageKey;
             string symbol = ticker.ToUpper();
             string endpoint = $"https://www.alphavantage.co/query";
             string function = "OVERVIEW";
@@ -74,10 +88,11 @@ namespace OzymandiasInvestments.Classes
                     string industry = companyData.Industry ?? "N/A";
                     string trailingPE = companyData.TrailingPE ?? "N/A";
                     string eps = companyData.EPS ?? "N/A";
-                    string targetPrice = Math.Round((decimal)companyData.AnalystTargetPrice, 2).ToString("0.00") ?? "N/A";
-                    string yearHigh = Math.Round((decimal)companyData["52WeekHigh"], 2).ToString("0.00") ?? "N/A";
-                    string yearLow = Math.Round((decimal)companyData["52WeekLow"], 2).ToString("0.00") ?? "N/A";
-                    string movingAverage = Math.Round((decimal)companyData["50DayMovingAverage"], 2).ToString("0.00") ?? "N/A";
+                    string targetPrice = companyData.AnalystTargetPrice?.Round(2)?.ToString("0.00") ?? "N/A";
+                    string yearHigh = companyData["52WeekHigh"]?.Round(2)?.ToString("0.00") ?? "N/A";
+                    string yearLow = companyData["52WeekLow"]?.Round(2)?.ToString("0.00") ?? "N/A";
+                    string movingAverage = companyData["50DayMovingAverage"]?.Round(2)?.ToString("0.00") ?? "N/A";
+
                     DetailedInfoModel info = new DetailedInfoModel
                     {
                         marketCap = ShortenNumber(marketCap),
@@ -118,7 +133,7 @@ namespace OzymandiasInvestments.Classes
                 return Math.Round(number, 2).ToString();
             }
 
-            return "Invalid input";
+            return "N/A";
         }
     }
 }

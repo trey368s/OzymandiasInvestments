@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using OzymandiasInvestments.Areas.Identity.Data;
 using OzymandiasInvestments.Classes;
 using OzymandiasInvestments.Models.AppSettingsModels;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("IdentityDBContextConnection") ?? throw new InvalidOperationException("Connection string 'IdentityDBContextConnection' not found.");
@@ -26,10 +27,12 @@ IConfiguration configuration = new ConfigurationBuilder()
 var configSettings = configuration.Get<ConfigOptions>();
 var ApiKey = configSettings.AlpacaApiSettings.ApiKey;
 var ApiSecret = configSettings.AlpacaApiSettings.ApiSecret;
+var alphaVantageKey = configSettings.alphaVantageKey;
 
-builder.Services.AddScoped<GetMarketData>(provider => new GetMarketData(ApiKey, ApiSecret));
+builder.Services.AddScoped<GetMarketData>(provider => new GetMarketData(ApiKey, ApiSecret, alphaVantageKey));
 builder.Services.AddScoped<GetOrderData>(provider => new GetOrderData(ApiKey, ApiSecret));
 builder.Services.AddScoped<GetPositionData>(provider => new GetPositionData(ApiKey, ApiSecret));
+builder.Services.AddScoped<GetActivityData>(provider => new GetActivityData(ApiKey, ApiSecret));
 
 builder.Services.AddControllersWithViews().AddRazorPagesOptions(options =>
 {

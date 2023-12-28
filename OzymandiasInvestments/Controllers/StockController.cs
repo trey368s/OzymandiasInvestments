@@ -23,11 +23,12 @@ namespace OzymandiasInvestments.Controllers
         private readonly GetMarketData _historicalData;
         private readonly GetOrderData _orderData;
         private readonly GetPositionData _positionData;
+        private readonly GetActivityData _activityData;
         private IEnumerable<IBar> _bars;
 
-        public StockController(UserManager<OzymandiasInvestmentsUser> userManager,
-            ILogger<StockController> logger,
-            InvestmentDbContext dbContext, GetMarketData historicalData, GetPositionData positionData, GetOrderData orderData)
+        public StockController(UserManager<OzymandiasInvestmentsUser> userManager, ILogger<StockController> logger,
+            InvestmentDbContext dbContext, GetMarketData historicalData, GetPositionData positionData, 
+            GetOrderData orderData, GetActivityData activityData)
         {
             _userManager = userManager;
             _logger = logger;
@@ -35,6 +36,7 @@ namespace OzymandiasInvestments.Controllers
             _historicalData = historicalData;
             _positionData = positionData;
             _orderData = orderData;
+            _activityData = activityData;
         }
         public IActionResult Startpage()
         {
@@ -69,16 +71,17 @@ namespace OzymandiasInvestments.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var investments = _dbContext.Investment
                 .Where(w => w.UserId == userId && w.Symbol == ticker.ToUpper().Trim())
-                .OrderByDescending(o => o.OpenTime)
-                .ToList();
+                .OrderByDescending(o => o.OpenTime).ToList();
             var info = await _historicalData.GetDetailedCompanyInfo(symbol);
+            var sma = await _historicalData.GetSmaDataAsync(symbol, start, end, timeframe);
             var viewModel = new HistoricalDataModel
             {
                 Bars = bars,
                 articles = news,
                 Investments = investments,
                 detailedInfo = info,
-                averageVolume = averageVolume
+                averageVolume = averageVolume,
+                sma = sma
             };
             return View("Index", viewModel);
         }
@@ -245,7 +248,15 @@ namespace OzymandiasInvestments.Controllers
         [Authorize]
         public async Task<IActionResult> Positions()
         {
-            var request = await _positionData.GetPositions();
+            var requestPositions = await _positionData.GetPositions();
+            var requestAccountInfo = await _positionData.GetAccountInfo();
+            var requestEquityInfo = await _positionData.GetEquity();
+            var request = new PositionModel
+            {
+                info = requestAccountInfo,
+                positions = requestPositions,
+                equityModelList = requestEquityInfo
+            };
             return View(request);
         }
 
@@ -261,7 +272,7 @@ namespace OzymandiasInvestments.Controllers
         [Authorize]
         public async Task<IActionResult> Activities()
         {
-            var request = await _orderData.GetOrders();
+            var request = await _activityData.GetActivities();
             return View(request);
         }
 
