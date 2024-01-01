@@ -24,11 +24,12 @@ namespace OzymandiasInvestments.Controllers
         private readonly GetOrderData _orderData;
         private readonly GetPositionData _positionData;
         private readonly GetActivityData _activityData;
+        private readonly SendEmail _sendEmail;
         private IEnumerable<IBar> _bars;
 
         public StockController(UserManager<OzymandiasInvestmentsUser> userManager, ILogger<StockController> logger,
             InvestmentDbContext dbContext, GetMarketData historicalData, GetPositionData positionData, 
-            GetOrderData orderData, GetActivityData activityData)
+            GetOrderData orderData, GetActivityData activityData, SendEmail sendEmail)
         {
             _userManager = userManager;
             _logger = logger;
@@ -37,7 +38,9 @@ namespace OzymandiasInvestments.Controllers
             _positionData = positionData;
             _orderData = orderData;
             _activityData = activityData;
+            _sendEmail = sendEmail;
         }
+
         public IActionResult Startpage()
         {
             return Redirect("https://stegeman.dev");
@@ -74,6 +77,7 @@ namespace OzymandiasInvestments.Controllers
                 .OrderByDescending(o => o.OpenTime).ToList();
             var info = await _historicalData.GetDetailedCompanyInfo(symbol);
             var sma = await _historicalData.GetSmaDataAsync(symbol, start, end, timeframe);
+            _sendEmail.CreateEmail("trey363636@gmail.com","Test", "Test");
             var viewModel = new HistoricalDataModel
             {
                 Bars = bars,

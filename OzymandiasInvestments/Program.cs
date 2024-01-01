@@ -28,11 +28,15 @@ var configSettings = configuration.Get<ConfigOptions>();
 var ApiKey = configSettings.AlpacaApiSettings.ApiKey;
 var ApiSecret = configSettings.AlpacaApiSettings.ApiSecret;
 var alphaVantageKey = configSettings.alphaVantageKey;
+var alphaVantageKey2 = configSettings.alphaVantageKey2;
+var emailSettings = configSettings.EmailSettings;
 
-builder.Services.AddScoped<GetMarketData>(provider => new GetMarketData(ApiKey, ApiSecret, alphaVantageKey));
-builder.Services.AddScoped<GetOrderData>(provider => new GetOrderData(ApiKey, ApiSecret));
-builder.Services.AddScoped<GetPositionData>(provider => new GetPositionData(ApiKey, ApiSecret));
-builder.Services.AddScoped<GetActivityData>(provider => new GetActivityData(ApiKey, ApiSecret));
+builder.Services.AddScoped(provider => new GetMarketData(ApiKey, ApiSecret, alphaVantageKey, alphaVantageKey2));
+builder.Services.AddScoped(provider => new GetOrderData(ApiKey, ApiSecret));
+builder.Services.AddScoped(provider => new GetPositionData(ApiKey, ApiSecret));
+builder.Services.AddScoped(provider => new GetActivityData(ApiKey, ApiSecret));
+builder.Services.AddScoped(provider => new SendEmail(emailSettings));
+
 
 builder.Services.AddControllersWithViews().AddRazorPagesOptions(options =>
 {

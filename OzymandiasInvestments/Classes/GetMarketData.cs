@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Alpaca.Markets.Extensions;
 using System.Linq;
 using OzymandiasInvestments.Models.SolutionModels;
+using MessagePack.Formatters;
 
 namespace OzymandiasInvestments.Classes
 {
@@ -17,14 +18,16 @@ namespace OzymandiasInvestments.Classes
         private readonly string _apiKey;
         private readonly string _apiSecret;
         private readonly string _alphaVantageKey;
+        private readonly string _alphaVantageKey2;
         private readonly object locker = new object();
         private readonly Dictionary<string, List<ITrade>> minuteBarsData = new Dictionary<string, List<ITrade>>();
 
-        public GetMarketData(string apiKey, string apiSecret, string alphaVantageKey)
+        public GetMarketData(string apiKey, string apiSecret, string alphaVantageKey, string alphaVantageKey2)
         {
             _apiKey = apiKey;
             _apiSecret = apiSecret;
             _alphaVantageKey = alphaVantageKey;
+            _alphaVantageKey2 = alphaVantageKey2;
         }
 
         public async Task<IEnumerable<IBar>> GetHistoricalDataAsync(string symbol, DateTime start, DateTime end, BarTimeFrame timeframe)
@@ -65,56 +68,58 @@ namespace OzymandiasInvestments.Classes
             }
             return newsArticlesList;
         }
-
         internal async Task<DetailedInfoModel> GetDetailedCompanyInfo(string ticker)
         {
-            string alphaVantageApiKey = _alphaVantageKey;
+            string[] alphaVantageApiKeys = { _alphaVantageKey, _alphaVantageKey2 };
             string symbol = ticker.ToUpper();
-            string endpoint = $"https://www.alphavantage.co/query";
+            string endpoint = "https://www.alphavantage.co/query";
             string function = "OVERVIEW";
 
-            string queryString = $"?function={function}&symbol={symbol}&apikey={alphaVantageApiKey}";
+            foreach (string apiKey in alphaVantageApiKeys)
+            {
+                DetailedInfoModel info = await GetCompanyInfoWithApiKey(endpoint, function, symbol, apiKey);
+
+                if (info.companyName != "N/A")
+                {
+                    return info;
+                }
+            }
+
+            return new DetailedInfoModel { };
+        }
+
+        private async Task<DetailedInfoModel> GetCompanyInfoWithApiKey(string endpoint, string function, string symbol, string apiKey)
+        {
+            string queryString = $"?function={function}&symbol={symbol}&apikey={apiKey}";
+
             using (HttpClient client = new HttpClient())
             {
                 HttpResponseMessage response = await client.GetAsync(endpoint + queryString);
+
                 if (response.IsSuccessStatusCode)
                 {
                     string responseData = await response.Content.ReadAsStringAsync();
                     dynamic companyData = Newtonsoft.Json.JsonConvert.DeserializeObject(responseData);
-                    string companyName = companyData.Name ?? "N/A";
-                    string marketCap = companyData.MarketCapitalization ?? "N/A";
-                    string description = companyData.Description ?? "N/A";
-                    string sector = companyData.Sector ?? "N/A";
-                    string industry = companyData.Industry ?? "N/A";
-                    string trailingPE = companyData.TrailingPE ?? "N/A";
-                    string eps = companyData.EPS ?? "N/A";
-                    string targetPrice = companyData.AnalystTargetPrice?.Round(2)?.ToString("0.00") ?? "N/A";
-                    string yearHigh = companyData["52WeekHigh"]?.Round(2)?.ToString("0.00") ?? "N/A";
-                    string yearLow = companyData["52WeekLow"]?.Round(2)?.ToString("0.00") ?? "N/A";
-                    string movingAverage = companyData["50DayMovingAverage"]?.Round(2)?.ToString("0.00") ?? "N/A";
+                    string marketCap = companyData.MarketCapitalization;
 
-                    DetailedInfoModel info = new DetailedInfoModel
+                    return new DetailedInfoModel
                     {
-                        marketCap = ShortenNumber(marketCap),
-                        companyName = companyName,
-                        description = description,
-                        sector = sector,
-                        industry = industry,
-                        yearHigh = yearHigh,
-                        yearLow = yearLow,
-                        targetPrice = targetPrice,
-                        movingAverage = movingAverage,
-                        eps = eps,
-                        trailingPE = trailingPE
+                        marketCap = ShortenNumber(marketCap) ?? "N/A",
+                        companyName = companyData.Name ?? "N/A",
+                        description = companyData.Description ?? "N/A",
+                        sector = companyData.Sector ?? "N/A",
+                        industry = companyData.Industry ?? "N/A",
+                        yearHigh = FormatNumericValue(companyData["52WeekHigh"]) ?? "N/A",
+                        yearLow = FormatNumericValue(companyData["52WeekLow"]) ?? "N/A",
+                        targetPrice = FormatNumericValue(companyData["AnalystTargetPrice"]) ?? "N/A",
+                        movingAverage = FormatNumericValue(companyData["50DayMovingAverage"]) ?? "N/A",
+                        eps = companyData.EPS ?? "N/A",
+                        trailingPE = companyData.TrailingPE ?? "N/A"
                     };
-                    return info;
-                }
-                else
-                {
-                    return new DetailedInfoModel { };
-                    //todo
                 }
             }
+
+            return new DetailedInfoModel { };
         }
 
         internal string ShortenNumber(string input)
@@ -134,6 +139,18 @@ namespace OzymandiasInvestments.Classes
             }
 
             return "N/A";
+        }
+
+        string FormatNumericValue(object value)
+        {
+            if (value != null && decimal.TryParse(value.ToString(), out decimal numericValue))
+            {
+                return numericValue.ToString("0.00");
+            }
+            else
+            {
+                return "N/A";
+            }
         }
     }
 }

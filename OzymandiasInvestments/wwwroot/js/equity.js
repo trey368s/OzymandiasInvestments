@@ -1,12 +1,9 @@
 ﻿document.addEventListener('DOMContentLoaded', function () {
     const requestEquityInfo = modelData;  // Assuming this is an asynchronous operation
-    console.log(requestEquityInfo);
 
     var data = requestEquityInfo.map(function (equityModel) {
         return { time: equityModel.tradingDay.toString(), value: parseFloat(equityModel.equity) };
     });
-
-    console.log(data);
 
     const chart = document.getElementById('doughnutChart');
     const chart2 = document.getElementById('chart');

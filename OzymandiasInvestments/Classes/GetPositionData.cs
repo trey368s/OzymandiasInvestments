@@ -1,4 +1,5 @@
 ﻿using Alpaca.Markets;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.VisualBasic;
 using OzymandiasInvestments.Migrations.InvestmentDb;
 using OzymandiasInvestments.Models.SolutionModels;
@@ -39,15 +40,22 @@ namespace OzymandiasInvestments.Classes
             
             var equityListModel = new List<EquityModel>();
             var counter = 0;
-            foreach(var equity in accountList)
+            foreach (var equity in accountList)
             {
-                var equitySnapshot = new EquityModel
+                try
                 {
-                    TradingDay = DateOnly.FromDateTime(calander[counter].TradingDateUtc).ToLongDateString(),
-                    Equity = equity.Equity.ToString()
-                };
-                counter++;
-                equityListModel.Add(equitySnapshot);    
+                    var equitySnapshot = new EquityModel
+                    {
+                        TradingDay = DateOnly.FromDateTime(calander[counter].TradingDateUtc).ToLongDateString(),
+                        Equity = equity.Equity.ToString()
+                    };
+                    counter++;
+                    equityListModel.Add(equitySnapshot);
+                }
+                catch
+                {
+                    break;
+                }
             }
             return equityListModel;
         }
