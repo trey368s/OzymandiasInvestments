@@ -77,7 +77,6 @@ namespace OzymandiasInvestments.Controllers
                 .OrderByDescending(o => o.OpenTime).ToList();
             var info = await _historicalData.GetDetailedCompanyInfo(symbol);
             var sma = await _historicalData.GetSmaDataAsync(symbol, start, end, timeframe);
-            _sendEmail.CreateEmail("trey363636@gmail.com","Test", "Test");
             var viewModel = new HistoricalDataModel
             {
                 Bars = bars,

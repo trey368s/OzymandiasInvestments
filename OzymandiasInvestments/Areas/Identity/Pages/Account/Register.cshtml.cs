@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using OzymandiasInvestments.Areas.Identity.Data;
+using OzymandiasInvestments.Classes;
 
 namespace OzymandiasInvestments.Areas.Identity.Pages.Account
 {
@@ -30,13 +31,14 @@ namespace OzymandiasInvestments.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<OzymandiasInvestmentsUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly SendEmail _sendEmail;
 
         public RegisterModel(
             UserManager<OzymandiasInvestmentsUser> userManager,
             IUserStore<OzymandiasInvestmentsUser> userStore,
             SignInManager<OzymandiasInvestmentsUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender, SendEmail sendEmail)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -44,6 +46,7 @@ namespace OzymandiasInvestments.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _sendEmail = sendEmail;
         }
 
         /// <summary>
@@ -145,7 +148,7 @@ namespace OzymandiasInvestments.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
+                    _sendEmail.CreateEmail(Input.Email, "Confirm your email",
                         $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)

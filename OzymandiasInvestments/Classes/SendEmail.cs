@@ -19,10 +19,14 @@ namespace OzymandiasInvestments.Classes
             var smtpPort = int.Parse(_emailSettings.SmtpPort);
             var senderName = _emailSettings.SenderName;
             var senderEmail = _emailSettings.SenderEmail;
+            var smtpUsername = _emailSettings.smtpUsername;
+            var smtpPassword = _emailSettings.smtpPassword;
 
             using (var client = new SmtpClient(smtpServer, smtpPort))
             {
                 client.UseDefaultCredentials = false;
+                client.Credentials = new NetworkCredential(smtpUsername, smtpPassword);
+                client.EnableSsl = true;
 
                 var mailMessage = new MailMessage
                 {
