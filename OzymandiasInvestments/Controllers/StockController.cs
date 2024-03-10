@@ -25,11 +25,12 @@ namespace OzymandiasInvestments.Controllers
         private readonly GetPositionData _positionData;
         private readonly GetActivityData _activityData;
         private readonly SendEmail _sendEmail;
+        private readonly GetChatGPTResponse _gptResponse;
         private IEnumerable<IBar> _bars;
 
         public StockController(UserManager<OzymandiasInvestmentsUser> userManager, ILogger<StockController> logger,
             InvestmentDbContext dbContext, GetMarketData historicalData, GetPositionData positionData, 
-            GetOrderData orderData, GetActivityData activityData, SendEmail sendEmail)
+            GetOrderData orderData, GetActivityData activityData, SendEmail sendEmail, GetChatGPTResponse gptResponse)
         {
             _userManager = userManager;
             _logger = logger;
@@ -39,6 +40,7 @@ namespace OzymandiasInvestments.Controllers
             _orderData = orderData;
             _activityData = activityData;
             _sendEmail = sendEmail;
+            _gptResponse = gptResponse;
         }
 
         public IActionResult Startpage()
@@ -63,29 +65,40 @@ namespace OzymandiasInvestments.Controllers
             DateTime start = DateTime.Now.AddMonths(-12);
             DateTime end = DateTime.Today.AddMinutes(-15);
             var timeframe = BarTimeFrame.Day;
+            
             var bars = await _historicalData.GetHistoricalDataAsync(symbol, start, end, timeframe);
             var recentBars = bars.OrderByDescending(b => b.TimeUtc).Take(10);
+
             var volume = recentBars.Any() ? recentBars.Average(b => b.Volume) : 0;
             var averageVolume = _historicalData.ShortenNumber(volume.ToString());
+
             var symbolsList = new List<string>();
             symbolsList.Add(ticker.ToUpper().Trim());
             var request = new NewsArticlesRequest(symbolsList);
             var news = await _historicalData.GetNewsAsync(request);
+
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var investments = _dbContext.Investment
                 .Where(w => w.UserId == userId && w.Symbol == ticker.ToUpper().Trim())
-                .OrderByDescending(o => o.OpenTime).ToList();
+                .OrderByDescending(o => o.OpenTime)
+                .ToList();
+
             var info = await _historicalData.GetDetailedCompanyInfo(symbol);
+
             var sma = await _historicalData.GetSmaDataAsync(symbol, start, end, timeframe);
+
+            var newsSentiment = await _gptResponse.SentimentChatBot(news, ticker);
+            
             var viewModel = new HistoricalDataModel
             {
                 Bars = bars,
-                articles = news,
+                articles = newsSentiment,
                 Investments = investments,
                 detailedInfo = info,
                 averageVolume = averageVolume,
                 sma = sma
             };
+
             return View("Index", viewModel);
         }
 

@@ -11,6 +11,7 @@
   <ItemGroup>
     <PackageReference Include="Alpaca.Markets" Version="6.2.0" />
     <PackageReference Include="Alpaca.Markets.Extensions" Version="6.2.0" />
+    <PackageReference Include="Azure.AI.OpenAI" Version="1.0.0-beta.13" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.23" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.23" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.23" />

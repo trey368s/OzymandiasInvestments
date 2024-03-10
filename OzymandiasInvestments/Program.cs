@@ -30,13 +30,17 @@ var ApiSecret = configSettings.AlpacaApiSettings.ApiSecret;
 var alphaVantageKey = configSettings.alphaVantageKey;
 var alphaVantageKey2 = configSettings.alphaVantageKey2;
 var emailSettings = configSettings.EmailSettings;
+var gptKey = configSettings.gptKey;
+
+var dockerGptKey = Environment.GetEnvironmentVariable("GPT_API_KEY");
 
 builder.Services.AddScoped(provider => new GetMarketData(ApiKey, ApiSecret, alphaVantageKey, alphaVantageKey2));
 builder.Services.AddScoped(provider => new GetOrderData(ApiKey, ApiSecret));
 builder.Services.AddScoped(provider => new GetPositionData(ApiKey, ApiSecret));
 builder.Services.AddScoped(provider => new GetActivityData(ApiKey, ApiSecret));
 builder.Services.AddScoped(provider => new SendEmail(emailSettings));
-
+builder.Services.AddScoped(provider => new GetChatGPTResponse(dockerGptKey));
+builder.Services.AddScoped(provider => new OpenAIService(dockerGptKey));
 
 builder.Services.AddControllersWithViews().AddRazorPagesOptions(options =>
 {
