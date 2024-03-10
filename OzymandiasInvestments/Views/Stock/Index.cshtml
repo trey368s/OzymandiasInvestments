@@ -24,7 +24,7 @@
 <div class="text-center">
     <h1 class="display-4">Investment Tracker</h1>
     <form class="d-flex" method="post" asp-controller="Stock" asp-action="Index">
-        <input class="form-control me-sm-2" type="search" name="ticker" id = "searchInput" placeholder="Ticker Lookup">
+        <input class="form-control me-sm-2" type="search" name="ticker" id="searchInput" placeholder="Enter a ticker symbol for detailed stock information.">
         <button class="btn btn-secondary my-2 my-sm-0" type="submit" id="searchButton">Search</button>
     </form>
 </div>
@@ -32,10 +32,169 @@
 <div class="container">
     @if (Model == null || Model.Bars.Count() == 0)
     {
-        <h4 class="text-center">Enter a ticker symbol for detailed stock information.</h4>
-        <center>
-            <img src="~/lib/Logo.png">
-        </center>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h1>Welcome</h1>
+                    <div class="accordion" id="accordionExample">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingOne">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                    My name is Ozymandias, King of Kings;
+                                </button>
+                            </h2>
+                            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample" style="">
+                                <div class="accordion-body">
+                                    <strong>"Look upon my works, ye mighty, and despair!"</strong> These words echo through the sands of time, as an ode to the ephemeral nature of power and glory. Inspired by Percy Shelley's poem, Ozymandias Investments stands as a testament to the transience of wealth and the enduring pursuit of financial wisdom.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingTwo">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                    The lone and level sands stretch far away.
+                                </button>
+                            </h2>
+                            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample" style="">
+                                <div class="accordion-body">
+                                    In the vast expanse of financial markets, where business empires rise and fall, we invite you to explore a realm where knowledge reigns supreme. Our platform is not just a gateway to investments; it is a chronicle of markets, a repository of information, and a compass in the ever-shifting sands of finance.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingThree">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                    Discover OzymandiasGPT
+                                </button>
+                            </h2>
+                            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample" style="">
+                                <div class="accordion-body">
+                                    <b><p>***Under Development***</p></b>
+                                    <p>Embark on a journey through the digital deserts with OzymandiasGPT. Unearth a treasure trove of financial insights as we traverse the virtual ruins, echoing the financial wisdom of ancient pharaohs.</p>
+                                    <a class="btn btn-primary" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button" aria-controls="offcanvasExample">
+                                        OzymandiasGPT
+                                    </a>
+                                    <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+                                        <div class="offcanvas-header">
+                                            <h5 class="offcanvas-title" id="offcanvasExampleLabel">OzymandiasGPT</h5>
+                                            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                                        </div>
+
+                                        <div class="offcanvas-body d-flex flex-column h-100">
+                                            <div id="chatWindow" class="flex-grow-1 overflow-auto border p-3 rounded custom-background">
+                                                <!-- Chat content goes here -->
+                                            </div>
+
+                                            <style>
+                                                .custom-background {
+                                                    background-color: #30115E;
+                                                    color: #7F6C9B;
+                                                }
+                                            </style>
+                                            <br>
+                                            <div class="row">
+                                                <div class="col-9">
+                                                    <input type="text" id="userInput" class="form-control mb-3 w-100" placeholder=" Say something...">
+                                                </div>
+                                                <div class="col-3">
+                                                    <button onclick="sendMessage()" class="btn btn-secondary btn-block w-100">Send</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <style>
+                                        @@keyframes loadingDots {
+                                            0% {
+                                                content: 'Loading';
+                                            }
+
+                                            25% {
+                                                content: 'Loading.';
+                                            }
+
+                                            50% {
+                                                content: 'Loading..';
+                                            }
+
+                                            75% {
+                                                content: 'Loading...';
+                                            }
+
+                                            100% {
+                                                content: 'Loading';
+                                            }
+                                        }
+                                    </style>
+
+                                    <style>
+                                        .loading-dots::after {
+                                            display: inline-block;
+                                            content: 'Loading...';
+                                            animation: loadingDots 1s infinite;
+                                        }
+                                    </style>
+
+                                    <script>
+                                        function sendMessage() {
+                                            var userInput = document.getElementById('userInput').value;
+                                            if (userInput.trim() === '') {
+                                                return; // Avoid sending empty messages
+                                            }
+
+                                            // Step 1: Append User's Message Immediately
+                                            var chatWindow = document.getElementById('chatWindow');
+                                            chatWindow.innerHTML += `<p><strong>You:</strong> ${userInput}</p>`;
+
+                                            // Step 2: Show Loading Indicator with Animation
+                                            var loadingMessageId = 'loading-' + Date.now(); // Unique ID for the loading message
+                                            chatWindow.innerHTML += `<p id="${loadingMessageId}"><strong>OzymandiasGPT:</strong> <span class="loading-dots"></span></p>`;
+
+                                            // Scroll to the bottom of the chat window
+                                            chatWindow.scrollTop = chatWindow.scrollHeight;
+
+                                            // Step 3: Fetch AI Response
+                                            fetch('/chat/ozymandiasgpt', {
+                                                method: 'POST',
+                                                headers: {
+                                                    'Content-Type': 'application/json',
+                                                },
+                                                body: JSON.stringify({ userInput: userInput })
+                                            })
+                                                .then(response => response.json())
+                                                .then(data => {
+                                                    if (data.success) {
+                                                        // Step 4: Update UI with AI Response
+                                                        // Replace loading message with actual response
+                                                        document.getElementById(loadingMessageId).innerHTML = `<strong>OzymandiasGPT:</strong> ${data.response}`;
+                                                    } else {
+                                                        document.getElementById(loadingMessageId).innerHTML = `<strong>OzymandiasGPT:</strong> Error getting response`;
+                                                    }
+                                                }).catch(error => {
+                                                    console.error('Error:', error);
+                                                    document.getElementById(loadingMessageId).innerHTML = `<strong>OzymandiasGPT:</strong> Error getting response`;
+                                                });
+
+                                            // Clear the input after sending
+                                            document.getElementById('userInput').value = '';
+                                        }
+
+                                        document.getElementById('userInput').addEventListener('keyup', function (event) {
+                                            if (event.key === 'Enter') {
+                                                sendMessage();
+                                            }
+                                        });
+                                    </script>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <img src="~/lib/Logo.png">
+                </div>
+            </div>
+        </div>
         <div class="toast show ms-auto" role="alert" aria-live="assertive" aria-atomic="true" style="position: fixed; bottom: 20px; right: 20px;">
             <div class="toast-header">
                 <strong class="me-auto">Disclaimer</strong>
@@ -54,7 +213,10 @@
             <div class="col-md-4">
                 <div class="card">
                     <div class="card-title">
-                        @if(Model.detailedInfo.companyName == "N/A")
+                        @if (Model.detailedInfo.companyName == "N/A" 
+                        | Model.detailedInfo.companyName == "" 
+                        | Model.detailedInfo.companyName == "null" 
+                        | Model.detailedInfo.companyName == null)
                         {
                             <h3 id="symbol"></h3>
                         }
@@ -82,7 +244,22 @@
                         {
                             @foreach (var article in Model.articles)
                             {
-                                <a href="@article.ArticleUrl"><p>@article.Headline</p></a>
+                                <div style="display: flex; align-items: center;">
+                                    <a href="@article.newsArticle.ArticleUrl" style="flex-grow: 1;">@article.newsArticle.Headline</a>
+                                    @if (int.Parse(article.sentiment.sentiment) < 50)
+                                    {
+                                        <span class="badge rounded-pill bg-danger">@article.sentiment.sentiment</span>
+                                    }
+                                    @if (int.Parse(article.sentiment.sentiment) < 75 && int.Parse(article.sentiment.sentiment) > 50)
+                                    {
+                                        <span class="badge rounded-pill bg-warning">@article.sentiment.sentiment</span>
+                                    }
+                                    @if (int.Parse(article.sentiment.sentiment) >= 75)
+                                    {
+                                        <span class="badge rounded-pill bg-success">@article.sentiment.sentiment</span>
+                                    }
+                                </div>
+                                <br>
                             }
                         }
                     </div>
