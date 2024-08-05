@@ -3,6 +3,7 @@
 #nullable disable
 
 using System;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
@@ -59,6 +60,10 @@ namespace OzymandiasInvestments.Areas.Identity.Pages.Account.Manage
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
+            public string AlpacaApiKey { get; set; }
+            public string AlpacaApiSecret { get; set; }
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
         }
 
         private async Task LoadAsync(OzymandiasInvestmentsUser user)
@@ -70,7 +75,11 @@ namespace OzymandiasInvestments.Areas.Identity.Pages.Account.Manage
 
             Input = new InputModel
             {
-                PhoneNumber = phoneNumber
+                PhoneNumber = phoneNumber,
+                AlpacaApiKey = user.AlpacaApiKey,
+                AlpacaApiSecret = user.AlpacaApiSecret,
+                FirstName = user.FirstName,
+                LastName = user.LastName
             };
         }
 
@@ -109,6 +118,18 @@ namespace OzymandiasInvestments.Areas.Identity.Pages.Account.Manage
                     StatusMessage = "Unexpected error when trying to set phone number.";
                     return RedirectToPage();
                 }
+            }
+
+            // Update Alpaca API Key and Secret
+            user.AlpacaApiKey = Input.AlpacaApiKey;
+            user.AlpacaApiSecret = Input.AlpacaApiSecret;
+            user.FirstName = Input.FirstName;
+            user.LastName = Input.LastName;
+            var updateResult = await _userManager.UpdateAsync(user);
+            if (!updateResult.Succeeded)
+            {
+                StatusMessage = "Unexpected error when trying to update Alpaca API keys.";
+                return RedirectToPage();
             }
 
             await _signInManager.RefreshSignInAsync(user);

@@ -75,7 +75,7 @@ namespace OzymandiasInvestments.Areas.Identity.Pages.Account
         public class InputModel
         {
             [Required]
-            [Display(Name="First Name")]
+            [Display(Name = "First Name")]
             [StringLength(255, ErrorMessage = "The first name should be less than 255 characters.")]
             public string FirstName { get; set; }
 
@@ -92,6 +92,20 @@ namespace OzymandiasInvestments.Areas.Identity.Pages.Account
             [EmailAddress]
             [Display(Name = "Email")]
             public string Email { get; set; }
+
+            [Phone]
+            [Required]
+            [Display(Name = "Phone Number")]
+            [StringLength(10, ErrorMessage = "The phone number should be 10 charaters")]
+            public string PhoneNumber { get; set; }
+
+            [Required]
+            [Display(Name = "Alpaca API Key")]
+            public string AlpacaApiKey { get; set; }
+
+            [Required]
+            [Display(Name = "Alpaca API Secret")]
+            public string AlpacaApiSecret { get; set; }
 
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -129,7 +143,11 @@ namespace OzymandiasInvestments.Areas.Identity.Pages.Account
                 var user = CreateUser();
 
                 user.FirstName = Input.FirstName;
-                user.LastName = Input.LastName; 
+                user.LastName = Input.LastName;
+                user.PhoneNumber = Input.PhoneNumber;
+                user.AlpacaApiKey = Input.AlpacaApiKey;
+                user.AlpacaApiSecret = Input.AlpacaApiSecret;
+
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);

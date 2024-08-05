@@ -65,7 +65,7 @@ namespace OzymandiasInvestments.Controllers
             DateTime start = DateTime.Now.AddMonths(-12);
             DateTime end = DateTime.Today.AddMinutes(-15);
             var timeframe = BarTimeFrame.Day;
-            
+
             var bars = await _historicalData.GetHistoricalDataAsync(symbol, start, end, timeframe);
             var recentBars = bars.OrderByDescending(b => b.TimeUtc).Take(10);
 
@@ -264,9 +264,12 @@ namespace OzymandiasInvestments.Controllers
         [Authorize]
         public async Task<IActionResult> Positions()
         {
-            var requestPositions = await _positionData.GetPositions();
-            var requestAccountInfo = await _positionData.GetAccountInfo();
-            var requestEquityInfo = await _positionData.GetEquity();
+            var user = await _userManager.GetUserAsync(User);
+            var ApiKey = user.AlpacaApiKey;
+            var SecretKey = user.AlpacaApiSecret;
+            var requestPositions = await _positionData.GetPositions(ApiKey,SecretKey);
+            var requestAccountInfo = await _positionData.GetAccountInfo(ApiKey,SecretKey);
+            var requestEquityInfo = await _positionData.GetEquity(ApiKey,SecretKey);
             var request = new PositionModel
             {
                 info = requestAccountInfo,
@@ -280,7 +283,10 @@ namespace OzymandiasInvestments.Controllers
         [Authorize]
         public async Task<IActionResult> Orders()
         {
-            var request = await _orderData.GetOrders();
+            var user = await _userManager.GetUserAsync(User);
+            var ApiKey = user.AlpacaApiKey;
+            var SecretKey = user.AlpacaApiSecret;
+            var request = await _orderData.GetOrders(ApiKey,SecretKey);
             return View(request);
         }
 
@@ -296,6 +302,10 @@ namespace OzymandiasInvestments.Controllers
         [Authorize]
         public async Task<IActionResult> CreateOrder(string symbol, decimal quantity, OrderSide side, OrderType orderType, decimal? limitPrice, decimal? stopPrice, decimal trailOffset, TimeInForce timeInForce, string quantityType, string trailType)
         {
+            var user = await _userManager.GetUserAsync(User);
+            var ApiKey = user.AlpacaApiKey;
+            var SecretKey = user.AlpacaApiSecret;
+
             OrderQuantity qty = OrderQuantity.Fractional(quantity);
             if (quantityType == "Dollars")
             {
@@ -306,7 +316,7 @@ namespace OzymandiasInvestments.Controllers
             {
                 offset = TrailOffset.InPercent(trailOffset);
             }
-            var request = await _orderData.CreateOrderAsync(symbol, qty, side, orderType, limitPrice, stopPrice, offset, timeInForce);
+            var request = await _orderData.CreateOrderAsync(symbol, qty, side, orderType, limitPrice, stopPrice, offset, timeInForce, ApiKey, SecretKey);
             return RedirectToAction("Orders");
         }
 

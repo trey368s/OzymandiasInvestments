@@ -9,26 +9,18 @@ namespace OzymandiasInvestments.Classes
 {
     public class GetPositionData
     {
-        private readonly string _apiKey;
-        private readonly string _apiSecret;
-        public GetPositionData(string apiKey, string apiSecret)
-        {
-            _apiKey = apiKey;
-            _apiSecret = apiSecret;
-        }
-
-        public async Task<DataTable> GetPositions()
+        public async Task<DataTable> GetPositions(string apiKey, string apiSecret)
         {
             var client = Alpaca.Markets.Environments.Paper
-            .GetAlpacaTradingClient(new SecretKey(_apiKey, _apiSecret));
+            .GetAlpacaTradingClient(new SecretKey(apiKey, apiSecret));
             var positions = await client.ListPositionsAsync();
             return ConvertToDataTable(positions);
         }
 
-        public async Task<List<EquityModel>> GetEquity()
+        public async Task<List<EquityModel>> GetEquity(string apiKey, string apiSecret)
         {
             var client = Alpaca.Markets.Environments.Paper
-            .GetAlpacaTradingClient(new SecretKey(_apiKey, _apiSecret));
+            .GetAlpacaTradingClient(new SecretKey(apiKey, apiSecret));
             var requestAccount = new PortfolioHistoryRequest
             {
                 Period = new HistoryPeriod(365, HistoryPeriodUnit.Day)
@@ -60,10 +52,10 @@ namespace OzymandiasInvestments.Classes
             return equityListModel;
         }
 
-        public async Task<AccountInfoModel> GetAccountInfo()
+        public async Task<AccountInfoModel> GetAccountInfo(string apiKey, string apiSecret)
         {
             var client = Alpaca.Markets.Environments.Paper
-            .GetAlpacaTradingClient(new SecretKey(_apiKey, _apiSecret));
+            .GetAlpacaTradingClient(new SecretKey(apiKey, apiSecret));
             var accountInfo = await client.GetAccountAsync();
             var accountValue = accountInfo.Equity.ToString();
             string formmatedAccountValue = string.Format("{0:N}", decimal.Parse(accountValue));

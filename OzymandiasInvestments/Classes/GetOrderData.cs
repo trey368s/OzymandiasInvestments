@@ -5,18 +5,10 @@ namespace OzymandiasInvestments.Classes
 {
     public class GetOrderData
     {
-        private readonly string _apiKey;
-        private readonly string _apiSecret;
-        public GetOrderData(string apiKey, string apiSecret)
-        {
-            _apiKey = apiKey;
-            _apiSecret = apiSecret;
-        }
-
-        public async Task<DataTable> GetOrders()
+        public async Task<DataTable> GetOrders(string apiKey, string apiSecret)
         {
             var client = Alpaca.Markets.Environments.Paper
-                .GetAlpacaTradingClient(new SecretKey(_apiKey, _apiSecret));
+                .GetAlpacaTradingClient(new SecretKey(apiKey, apiSecret));
             var orders = await client.ListOrdersAsync(
                 new ListOrdersRequest
                 {
@@ -26,9 +18,9 @@ namespace OzymandiasInvestments.Classes
             return ConvertToDataTable(orders);
         }
 
-        public async Task<IOrder> CreateOrderAsync(string symbol, OrderQuantity quantity, OrderSide side, OrderType orderType, decimal? limitPrice, decimal? stopPrice, TrailOffset trailOffset, TimeInForce timeInForce)
+        public async Task<IOrder> CreateOrderAsync(string symbol, OrderQuantity quantity, OrderSide side, OrderType orderType, decimal? limitPrice, decimal? stopPrice, TrailOffset trailOffset, TimeInForce timeInForce, string ApiKey, string SecretKey)
         {
-            var client = Alpaca.Markets.Environments.Paper.GetAlpacaTradingClient(new SecretKey(_apiKey, _apiSecret));
+            var client = Alpaca.Markets.Environments.Paper.GetAlpacaTradingClient(new SecretKey(ApiKey, SecretKey));
 
             IOrder order = null;
             switch (orderType)

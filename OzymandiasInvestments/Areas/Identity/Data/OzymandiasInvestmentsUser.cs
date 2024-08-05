@@ -11,5 +11,7 @@ public class OzymandiasInvestmentsUser : IdentityUser
 {
     public string FirstName { get; set; }
     public string LastName { get; set; }
+    public string AlpacaApiKey { get; set; }
+    public string AlpacaApiSecret { get; set; }
 }
 

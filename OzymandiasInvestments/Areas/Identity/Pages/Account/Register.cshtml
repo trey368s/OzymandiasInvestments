@@ -23,6 +23,11 @@
                 <span asp-validation-for="Input.LastName" class="text-danger"></span>
             </div>
             <div class="form-floating">
+                <input asp-for="Input.PhoneNumber" class="form-control" autocomplete="phonenumber" aria-required="true" />
+                <label asp-for="Input.PhoneNumber"></label>
+                <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+            </div>
+            <div class="form-floating">
                 <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" />
                 <label asp-for="Input.Email"></label>
                 <span asp-validation-for="Input.Email" class="text-danger"></span>
@@ -37,10 +42,53 @@
                 <label asp-for="Input.ConfirmPassword"></label>
                 <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
             </div>
+            <div class="form-floating">
+                <input asp-for="Input.AlpacaApiKey" class="form-control" autocomplete="api-key" aria-required="true" />
+                <label asp-for="Input.AlpacaApiKey" ></label>
+                <span asp-validation-for="Input.AlpacaApiKey" class="text-danger"></span>
+            </div>
+            <div class="form-floating">
+                <input asp-for="Input.AlpacaApiSecret" class="form-control" autocomplete="lastname" aria-required="true" />
+                <label asp-for="Input.AlpacaApiSecret"></label>
+                <span asp-validation-for="Input.AlpacaApiSecret" class="text-danger"></span>
+            </div>
             <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
         </form>
     </div>
     <div class="col-md-6 col-md-offset-2">
+        <section>
+            <h3>Ozymandias</h3>
+            <hr />
+            <div>
+                <p>
+                    I met a traveller from an antique land,
+                    Who said—“Two vast and trunkless legs of stone
+                    Stand in the desert. . . . Near them, on the sand,
+                    Half sunk a shattered visage lies, whose frown,
+                    And wrinkled lip, and sneer of cold command,
+                    Tell that its sculptor well those passions read
+                    Which yet survive, stamped on these lifeless things,
+                    The hand that mocked them, and the heart that fed;
+                    And on the pedestal, these words appear:
+                    My name is Ozymandias, King of Kings;
+                    Look on my Works, ye Mighty, and despair!
+                    Nothing beside remains. Round the decay
+                    Of that colossal Wreck, boundless and bare
+                    The lone and level sands stretch far away.”
+                </p>
+                <br>
+                <p>By Percy Bysshe Shelley</p>
+                <br />
+                @*<p>There are no external authentication services configured. See this <a href="https://go.microsoft.com/fwlink/?LinkID=532715">article about setting up this ASP.NET application to support logging in via external services</a>.</p>*@
+            </div>
+        </section>
+        <section>
+            <h3>Alpaca Markets</h3>
+            <hr />
+            <div>
+                <p>Sign up for an account on <a href="https://alpaca.markets">Alpaca.markets</a> to create a live or paper brokerage account and get your API key and secret.</p>
+            </div>
+        </section>
         @*<section>
             <h3>Use another service to register.</h3>
             <hr />

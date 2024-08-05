@@ -12,41 +12,50 @@
     <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">Create an order</button>
     @await Html.PartialAsync("CreateOrder")
 </h3>
-
-<div class="table-responsive mt-3">
-    <table class="table table-hover">
-        <tr>
-            <th></th>
-            @foreach (DataColumn column in Model.Columns)
-            {
-                <th><b>@column.ColumnName</b></th>
-            }
-        </tr>
-        @foreach (DataRow row in Model.Rows)
-        {
-            <tr style="border: 1px solid cyan;">
-                <td></td>
+@if(Model.Rows.Count != 0)
+{
+    <div class="table-responsive mt-3">
+        <table class="table table-hover">
+            <tr>
+                <th></th>
                 @foreach (DataColumn column in Model.Columns)
                 {
-                    if (column.ColumnName == "Symbol")
-                    {
-                        <td>
-                            <form id="postForm_@rowIndex" method="post" action="@Url.Action("Index", "Stock")">
-                                <input type="hidden" name="ticker" value="@row["Symbol"]" />
-                            </form>
-                            <a style="text-decoration: underline; cursor: pointer; color: cyan;" onclick="submitForm('postForm_@rowIndex')">@row["Symbol"]</a>
-                        </td>
-                    }
-                    else
-                    {
-                        <td>@row[column]</td>
-                    }
+                    <th><b>@column.ColumnName</b></th>
                 }
             </tr>
-            rowIndex++;
-        }
-    </table>
-</div>
+            @foreach (DataRow row in Model.Rows)
+            {
+                <tr style="border: 1px solid cyan;">
+                    <td></td>
+                    @foreach (DataColumn column in Model.Columns)
+                    {
+                        if (column.ColumnName == "Symbol")
+                        {
+                            <td>
+                                <form id="postForm_@rowIndex" method="post" action="@Url.Action("Index", "Stock")">
+                                    <input type="hidden" name="ticker" value="@row["Symbol"]" />
+                                </form>
+                                <a style="text-decoration: underline; cursor: pointer; color: cyan;" onclick="submitForm('postForm_@rowIndex')">@row["Symbol"]</a>
+                            </td>
+                        }
+                        else
+                        {
+                            <td>@row[column]</td>
+                        }
+                    }
+                </tr>
+                rowIndex++;
+            }
+        </table>
+    </div>
+}
+else
+{
+    <br>
+    <div class="alert alert-light" role="alert">
+        You have no orders yet. Click the above button to create one.
+    </div>
+}
 <br>
 <script>
     function submitForm(formId) {

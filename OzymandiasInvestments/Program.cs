@@ -35,8 +35,8 @@ var gptKey = configSettings.gptKey;
 var dockerGptKey = Environment.GetEnvironmentVariable("GPT_API_KEY");
 
 builder.Services.AddScoped(provider => new GetMarketData(ApiKey, ApiSecret, alphaVantageKey, alphaVantageKey2));
-builder.Services.AddScoped(provider => new GetOrderData(ApiKey, ApiSecret));
-builder.Services.AddScoped(provider => new GetPositionData(ApiKey, ApiSecret));
+builder.Services.AddScoped(provider => new GetOrderData());
+builder.Services.AddScoped(provider => new GetPositionData());
 builder.Services.AddScoped(provider => new GetActivityData(ApiKey, ApiSecret));
 builder.Services.AddScoped(provider => new SendEmail(emailSettings));
 builder.Services.AddScoped(provider => new GetChatGPTResponse(dockerGptKey));

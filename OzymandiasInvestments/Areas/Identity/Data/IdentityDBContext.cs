@@ -30,7 +30,9 @@ internal class OzymandiasInvestmentsUserEntityConfiguration : IEntityTypeConfigu
     {
         builder.Property(u => u.FirstName).HasMaxLength(255);
         builder.Property(u => u.LastName).HasMaxLength(255);
-
+        builder.Property(u => u.AlpacaApiKey).HasMaxLength(255);
+        builder.Property(u => u.AlpacaApiSecret).HasMaxLength(255);
+        builder.Property(u => u.PhoneNumber).HasMaxLength(10);
     }
 }
 
